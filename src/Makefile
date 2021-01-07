@@ -6,7 +6,7 @@ INCL = cub3D.h
 all: $(NAME)
 
 $(NAME): $(SRCS) $(INCL)
-	CC $(SRCS) -o $(NAME)
+	CC $(SRCS) -L /usr/local/lib/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 clean:
 
