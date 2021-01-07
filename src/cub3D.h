@@ -1,11 +1,11 @@
 #include "/usr/local/include/mlx.h"
 
-#define mapWidth 24
-#define mapHeight 24
-#define screenWidth 640
-#define screenHeight 480
+#define map_width 24
+#define map_height 24
+#define screen_width 640
+#define screen_height 480
 
-const int worldMap[mapWidth][mapHeight] =
+const int worldMap[map_width][map_height] =
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
   {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
