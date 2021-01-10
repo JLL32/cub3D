@@ -2,11 +2,13 @@ NAME = cub3D
 CC = clang
 SRCS = main.c
 INCL = cub3D.h
+MLX = ./mlx/Makefile
 
 all: $(NAME)
 
 $(NAME): $(SRCS) $(INCL)
-	CC $(SRCS) -L /usr/local/lib/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	make -C ./mlx/
+	CC $(SRCS) -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 clean:
 

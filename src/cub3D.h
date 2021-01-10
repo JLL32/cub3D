@@ -1,4 +1,5 @@
-#include "/usr/local/include/mlx.h"
+#include "./mlx/mlx.h"
+#include <stdlib.h>
 
 #define map_width 24
 #define map_height 24
