@@ -12,7 +12,7 @@ typedef struct  s_vars {
 
 typedef struct  s_data {
 	void        *img;
-	char        *addr;
+	int        *addr;
 	int         bits_per_pixel;
 	int         line_length;
 	int         endian;
@@ -26,7 +26,7 @@ enum colors {
 	yellow	= 0x0FFFF00,
 	olive	= 0x0808000,
 	blue	= 0x00000FF,
-	white	= 0x0000000,
+	white	= 0xFFFFFFF,
 	green	= 0x0008000,
 };
 
@@ -57,10 +57,8 @@ t_vars vars;
 double plane_x = 0, plane_y = 0.66; /*the 2D raycaster version of camera plane*/
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
-	char    *dst;
-
-	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
+	if (y < screen_height && y >= 0)
+		data->addr[(y) * screen_width + (x)] = color;
 }
 
 void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
@@ -71,8 +69,28 @@ void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_var
 		my_mlx_pixel_put(img, x, y, color);
 		y++;
 	}
+}
+void horizontal_line(int y, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
+{
+	int x = draw_start;
+	while (x <= draw_end)
+	{
+		my_mlx_pixel_put(img, x, y, color);
+		x++;
+	}
 	
 }
+
+void clear()
+{
+	int y = 0;
+	while (y <= screen_height)
+	{
+		horizontal_line(y, 0, screen_width, 0x0000000, vars, &img);
+		y++;
+	}
+}
+
 
 int key_press(int keycode, t_player *player)
 {
@@ -229,12 +247,11 @@ int game_loop(t_player *player)
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	
 	// TODO: clear the screen with a recyled image using mlx_put_image_to_window
-	/* mlx_clear_window(vars.mlx, vars.win); */
+	clear();
 	// speed modifiers
-	player->move_speed = frame_time * 5.0;
-	player->rot_speed = frame_time * 3.0;
+	player->move_speed = frame_time * 1.0;
+	player->rot_speed = frame_time * 1.0;
 
 	return 0;
 }
@@ -242,19 +259,15 @@ int game_loop(t_player *player)
 
 int		main(int argc, char *argv[argc])
 {
-	double plane_x = 0, plane_y = 0.66; /*the 2D raycaster version of camera plane*/
-
 	t_player player = {.pos_x = 22, .pos_y = 12, .dir_x = -1, .dir_y = 0, .move_speed = 1};
 
 	double time = 0; /*time of the current frame*/
 	double time_old = 0; /*time of the previous frame*/
 
-
 	vars.mlx = mlx_init();
 	vars.win = mlx_new_window(vars.mlx, screen_width, screen_height, "Cub3D");
 	img.img = mlx_new_image(vars.mlx, screen_width, screen_height);
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
-								 &img.endian);
+	img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
 
 	mlx_loop_hook(vars.mlx, game_loop, &player);
 
