@@ -1,5 +1,8 @@
 #include "./mlx/mlx.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <stdbool.h>
 
 #define map_width 24
 #define map_height 24
