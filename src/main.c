@@ -1,16 +1,16 @@
 #include "cub3D.h"
 
 typedef struct  s_vars {
-    void        *mlx;
-    void        *win;
+	void        *mlx;
+	void        *win;
 }               t_vars;
 
 typedef struct  s_data {
-    void        *img;
-    char        *addr;
-    int         bits_per_pixel;
-    int         line_length;
-    int         endian;
+	void        *img;
+	char        *addr;
+	int         bits_per_pixel;
+	int         line_length;
+	int         endian;
 }               t_data;
 
 typedef int t_hex_color;
@@ -20,16 +20,16 @@ enum colors {
 	maroon	= 0x0800000,
 	yellow	= 0x0FFFF00,
 	olive	= 0x0808000,
-	blue	= 0x00000ff
+	blue	= 0x00000FF,
 } colors;
 
 
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
-    char    *dst;
+	char    *dst;
 
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
-    *(unsigned int*)dst = color;
+	dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	*(unsigned int*)dst = color;
 }
 
 void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
@@ -67,9 +67,9 @@ int		main(int argc, char *argv[argc])
 	my_mlx_pixel_put(&img, 4, 5, maroon);
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 4, 5);
 
-	vertical_line(100, 5, 80, yellow, vars, &img);
+	/* vertical_line(100, 5, 80, yellow, vars, &img); */
 
-	for(int x = 0; x < screen_width; x++) 
+	for(int x = 0; x < screen_width; x++)
 	{
 		//calculate ray position and direction
 		double camera_x = 2 * x / (double)screen_width - 1; //x-coordinate in camera space
@@ -85,8 +85,8 @@ int		main(int argc, char *argv[argc])
 		double side_dist_y;
 
 		//length of ray from one x or y-side to next x or y-side
-		double delta_dist_x = (ray_dir_y == 0) ? 0 : ((ray_dir_x == 0) ? 1 : abs(1 / (int)ray_dir_x));
-		double delta_dist_y = (ray_dir_x == 0) ? 0 : ((ray_dir_y == 0) ? 1 : abs(1 / (int)ray_dir_y));
+		double delta_dist_x = (ray_dir_y == 0) ? 0 : ((ray_dir_x == 0) ? 1 : abs((int)(1 / ray_dir_x)));
+		double delta_dist_y = (ray_dir_x == 0) ? 0 : ((ray_dir_y == 0) ? 1 : abs((int)(1 / ray_dir_y)));
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -168,7 +168,7 @@ int		main(int argc, char *argv[argc])
 	}
 
 
-    mlx_loop(vars.mlx);
+	mlx_loop(vars.mlx);
 
 	return (0);
 }
