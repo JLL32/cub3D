@@ -21,13 +21,13 @@ typedef struct  s_data {
 typedef int t_hex_color;
 
 enum colors {
-	red		= 0x00FF000,
+	red		= 0x0FF0000,
 	maroon	= 0x0800000,
 	yellow	= 0x0FFFF00,
-	olive	= 0x0808000,
 	blue	= 0x00000FF,
 	white	= 0xFFFFFFF,
 	green	= 0x0008000,
+	black	= 0x0000000,
 };
 
 enum keys {
@@ -54,7 +54,9 @@ typedef struct s_player {
 t_data  img;
 
 t_vars vars;
-double plane_x = 0, plane_y = 0.66; /*the 2D raycaster version of camera plane*/
+
+double plane_x, plane_y; /*the 2D raycaster version of camera plane*/
+
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
 	if (y < screen_height && y >= 0)
@@ -97,37 +99,37 @@ int key_press(int keycode, t_player *player)
 
 	if (keycode == arrow_up)
 	{
-		printf("%d\n", keycode);
-		if (worldMap[(int)(player->pos_x + player->dir_x * player->move_speed)][(int)player->pos_y] == false)
+		/* printf("%d\n", keycode); */
+		if (worldMap[(int)(player->pos_x + player->dir_x * player->move_speed)][(int)(player->pos_y)] == false)
 			player->pos_x += player->dir_x * player->move_speed;
-		if (worldMap[(int)player->pos_x][(int)(player->pos_y + player->dir_y * player->move_speed)] == false)
+		if (worldMap[(int)(player->pos_x)][(int)(player->pos_y + player->dir_y * player->move_speed)] == false)
 			player->pos_y += player->dir_y * player->move_speed;
 	}
 	if (keycode == arrow_down)
 	{
 		if (worldMap[(int)(player->pos_x - player->dir_x * player->move_speed)][(int)(player->pos_y)] == false)
 			player->pos_x -= player->dir_x * player->move_speed;
-		if (worldMap[(int)player->pos_x][(int)(player->pos_y -player->dir_y)] == false)
+		if (worldMap[(int)player->pos_x][(int)(player->pos_y - player->dir_y * player->move_speed)] == false)
 			player->pos_y -= player->dir_y * player->move_speed;
 	}
 	if (keycode == arrow_right)
 	{
-		double old_dir = player->dir_x;
+		double old_dir_x = player->dir_x;
 		player->dir_x = player->dir_x * cos(-player->rot_speed) - player->dir_y * sin(-player->rot_speed);
-		player->dir_y = old_dir * sin(-player->rot_speed) + player->dir_y * cos(-player->rot_speed);
+		player->dir_y = old_dir_x * sin(-player->rot_speed) + player->dir_y * cos(-player->rot_speed);
 		double old_plane_x = plane_x;
 		plane_x = plane_x * cos(-player->rot_speed) - plane_y * sin(-player->rot_speed);
 		plane_y = old_plane_x * sin(-player->rot_speed) + plane_y * cos(-player->rot_speed);
 	}
 	if (keycode == arrow_left)
 	{
-		      //both camera direction and camera plane must be rotated
-      double old_dir_x = player->dir_x;
-      player->dir_x = player->dir_x * cos(player->rot_speed) - player->dir_y * sin(player->rot_speed);
-      player->dir_y = old_dir_x * sin(player->rot_speed) + player->dir_y * cos(player->rot_speed);
-      double old_plane_x = plane_x;
-      plane_x = plane_x * cos(player->rot_speed) - plane_y * sin(player->rot_speed);
-      plane_y = old_plane_x * sin(player->rot_speed) + plane_y * cos(player->rot_speed);
+		//both camera direction and camera plane must be rotated
+		double old_dir_x = player->dir_x;
+		player->dir_x = player->dir_x * cos(player->rot_speed) - player->dir_y * sin(player->rot_speed);
+		player->dir_y = old_dir_x * sin(player->rot_speed) + player->dir_y * cos(player->rot_speed);
+		double old_plane_x = plane_x;
+		plane_x = plane_x * cos(player->rot_speed) - plane_y * sin(player->rot_speed);
+		plane_y = old_plane_x * sin(player->rot_speed) + plane_y * cos(player->rot_speed);
 	}
 
 	return 0;
@@ -135,9 +137,6 @@ int key_press(int keycode, t_player *player)
 
 int game_loop(t_player *player)
 {
-	double time = 0; /*time of the current frame*/
-	double time_old = 0; /*time of the previous frame*/
-
 	for(int x = 0; x < screen_width; x++)
 	{
 		//calculate ray position and direction
@@ -146,8 +145,8 @@ int game_loop(t_player *player)
 		double ray_dir_y = player->dir_y + plane_y * camera_x;
 		
 		//which box of the map we're in
-		int map_x = player->pos_x;
-		int map_y = player->pos_y;
+		int map_x = (int)player->pos_x;
+		int map_y = (int)player->pos_y;
 
 		//length of ray from current position to next x or y-side
 		double side_dist_x;
@@ -156,6 +155,8 @@ int game_loop(t_player *player)
 		//length of ray from one x or y-side to next x or y-side
 		double delta_dist_x = (ray_dir_y == 0) ? 0 : ((ray_dir_x == 0) ? 1 : abs((int)(1 / ray_dir_x)));
 		double delta_dist_y = (ray_dir_x == 0) ? 0 : ((ray_dir_y == 0) ? 1 : abs((int)(1 / ray_dir_y)));
+		/* double delta_dist_x = abs((1.0 / ray_dir_x)); */
+		/* double delta_dist_y = abs((1.0 / ray_dir_y)); */
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -169,7 +170,7 @@ int game_loop(t_player *player)
 		if (ray_dir_x < 0)
 		{
 			step_x = -1;
-			side_dist_x = (player->pos_x- map_x) * delta_dist_x;
+			side_dist_x = (player->pos_x - map_x) * delta_dist_x;
 		}
 		else
 		{
@@ -204,7 +205,7 @@ int game_loop(t_player *player)
 				side = 1;
 			}
 			/*check if ray has hit a wall*/
-			if (worldMap[map_x][map_x] > 0) hit = 1;
+			if (worldMap[map_x][map_y] > 0) hit = 1;
 		}
 		/*Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
 		if (side == 0)
@@ -230,28 +231,22 @@ int game_loop(t_player *player)
 		case 4:  color = white;  break;
 		default: color = yellow; break;
 		}
-
-		if (side == 1) color = color / 2;
+		
+		// gives x and y different brightness
+		/* if (side == 1) color = color / 2; */
 
 		vertical_line(x, draw_start, draw_end, color, vars, &img);
 	}
-	// timing for input in FPS counter
-	time_old = time;
-	time = (double)clock() / CLOCKS_PER_SEC;
-	double frame_time = (time - time_old);
-
-	char frame_per_s[100];
-	sprintf(frame_per_s, "%lf", 1 / frame_time);
-	mlx_string_put(vars.mlx, vars.win, 0, 0, white, frame_per_s);
-
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	// TODO: clear the screen with a recyled image using mlx_put_image_to_window
+	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
 	clear();
+	/* mlx_destroy_window(vars.mlx, vars.win); */
+	/* vars.win = mlx_new_window(vars.mlx, screen_width, screen_height, "Cub3D"); */
 	// speed modifiers
-	player->move_speed = frame_time * 1.0;
-	player->rot_speed = frame_time * 1.0;
+	player->move_speed = 0.5; //frame_time * 5.0; // the constant value is squares / second
+	player->rot_speed = 0.06; //frame_time * 3.0; // the constant value is in radian / second
 
 	return 0;
 }
@@ -260,9 +255,8 @@ int game_loop(t_player *player)
 int		main(int argc, char *argv[argc])
 {
 	t_player player = {.pos_x = 22, .pos_y = 12, .dir_x = -1, .dir_y = 0, .move_speed = 1};
-
-	double time = 0; /*time of the current frame*/
-	double time_old = 0; /*time of the previous frame*/
+	plane_x = 0;
+	plane_y = .66;
 
 	vars.mlx = mlx_init();
 	vars.win = mlx_new_window(vars.mlx, screen_width, screen_height, "Cub3D");
@@ -271,7 +265,8 @@ int		main(int argc, char *argv[argc])
 
 	mlx_loop_hook(vars.mlx, game_loop, &player);
 
-	mlx_key_hook(vars.win, key_press, &player);
+	/* mlx_key_hook(vars.win, key_press, &player); */
+	mlx_hook(vars.win, 2, 0, key_press, &player);
 
 	mlx_loop(vars.mlx);
 
