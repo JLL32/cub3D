@@ -1,9 +1,5 @@
 #include "cub3D.h"
 #include "mlx/mlx.h"
-#include <stdio.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <math.h>
 
 typedef struct  s_vars {
 	void        *mlx;
@@ -28,6 +24,8 @@ enum colors {
 	white	= 0xFFFFFFF,
 	green	= 0x0008000,
 	black	= 0x0000000,
+	light_blue = 0xADD8E6,
+	gray = 0x5A5A5A,
 };
 
 enum keys {
@@ -63,15 +61,15 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 		data->addr[(y) * screen_width + (x)] = color;
 }
 
-void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
-{
-	int y = draw_start;
-	while (y <= draw_end)
-	{
-		my_mlx_pixel_put(img, x, y, color);
-		y++;
-	}
-}
+/* void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img) */
+/* { */
+/* 	int y = draw_start; */
+/* 	while (y <= draw_end) */
+/* 	{ */
+/* 		my_mlx_pixel_put(img, x, y, color); */
+/* 		y++; */
+/* 	} */
+/* } */
 void horizontal_line(int y, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
 {
 	int x = draw_start;
@@ -83,25 +81,27 @@ void horizontal_line(int y, int draw_start, int draw_end, t_hex_color color, t_v
 	
 }
 
-/* void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img) */
-/* { */
-/* 	int y = 0; */
-/* 	while (y <= draw_start) */
-/* 	{ */
-/* 		my_mlx_pixel_put(img, x, y, black); */
-/* 		y++; */
-/* 	} */
-/* 	while (y <= draw_end) */
-/* 	{ */
-/* 		my_mlx_pixel_put(img, x, y, color); */
-/* 		y++; */
-/* 	} */
-/* 	while (y <= screen_height) */
-/* 	{ */
-/* 		my_mlx_pixel_put(img, x, y, black); */
-/* 		y++; */
-/* 	} */
-/* } */
+// draws the whole scene so we won't need to clear after each frame
+void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img)
+{
+	// TODO: get floor and ceiling colors from an external variable not the colors enum
+	int y = 0;
+	while (y <= draw_start)
+	{
+		my_mlx_pixel_put(img, x, y, light_blue);
+		y++;
+	}
+	while (y <= draw_end)
+	{
+		my_mlx_pixel_put(img, x, y, color);
+		y++;
+	}
+	while (y <= screen_height)
+	{
+		my_mlx_pixel_put(img, x, y, gray);
+		y++;
+	}
+}
 void clear()
 {
 	int y = 0;
@@ -171,8 +171,8 @@ int game_loop(t_player *player)
 		double side_dist_y;
 
 		//length of ray from one x or y-side to next x or y-side
-		double delta_dist_x = fabs((1.0 / ray_dir_x));
-		double delta_dist_y = fabs((1.0 / ray_dir_y));
+		double delta_dist_x = fabs(1.0 / ray_dir_x);
+		double delta_dist_y = fabs(1.0 / ray_dir_y);
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -257,7 +257,7 @@ int game_loop(t_player *player)
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
 	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
-	clear();
+	/* clear(); */
 	/* mlx_destroy_image(vars.mlx, img.img); */
 	/* img.img = mlx_new_image(vars.mlx, screen_width, screen_height); */
 	/* img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian); */
