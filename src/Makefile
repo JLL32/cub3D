@@ -7,7 +7,7 @@ MLX = ./mlx/Makefile
 
 all: $(NAME)
 
-$(NAME): $(SRCS) $(INCL)
+$(NAME): $(SRCS) $(INCL) ./mlx/Makefile
 	make -C ./mlx/
 	CC $(SRCS) -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
