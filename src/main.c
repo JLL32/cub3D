@@ -83,6 +83,25 @@ void horizontal_line(int y, int draw_start, int draw_end, t_hex_color color, t_v
 	
 }
 
+/* void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_vars vars, t_data *img) */
+/* { */
+/* 	int y = 0; */
+/* 	while (y <= draw_start) */
+/* 	{ */
+/* 		my_mlx_pixel_put(img, x, y, black); */
+/* 		y++; */
+/* 	} */
+/* 	while (y <= draw_end) */
+/* 	{ */
+/* 		my_mlx_pixel_put(img, x, y, color); */
+/* 		y++; */
+/* 	} */
+/* 	while (y <= screen_height) */
+/* 	{ */
+/* 		my_mlx_pixel_put(img, x, y, black); */
+/* 		y++; */
+/* 	} */
+/* } */
 void clear()
 {
 	int y = 0;
@@ -131,7 +150,6 @@ int key_press(int keycode, t_player *player)
 		plane_x = plane_x * cos(player->rot_speed) - plane_y * sin(player->rot_speed);
 		plane_y = old_plane_x * sin(player->rot_speed) + plane_y * cos(player->rot_speed);
 	}
-
 	return 0;
 }
 
@@ -153,10 +171,8 @@ int game_loop(t_player *player)
 		double side_dist_y;
 
 		//length of ray from one x or y-side to next x or y-side
-		double delta_dist_x = (ray_dir_y == 0) ? 0 : ((ray_dir_x == 0) ? 1 : abs((int)(1 / ray_dir_x)));
-		double delta_dist_y = (ray_dir_x == 0) ? 0 : ((ray_dir_y == 0) ? 1 : abs((int)(1 / ray_dir_y)));
-		/* double delta_dist_x = abs((1.0 / ray_dir_x)); */
-		/* double delta_dist_y = abs((1.0 / ray_dir_y)); */
+		double delta_dist_x = fabs((1.0 / ray_dir_x));
+		double delta_dist_y = fabs((1.0 / ray_dir_y));
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -233,7 +249,7 @@ int game_loop(t_player *player)
 		}
 		
 		// gives x and y different brightness
-		/* if (side == 1) color = color / 2; */
+		if (side == 1) color = color / 2;
 
 		vertical_line(x, draw_start, draw_end, color, vars, &img);
 	}
@@ -242,11 +258,12 @@ int game_loop(t_player *player)
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
 	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
 	clear();
-	/* mlx_destroy_window(vars.mlx, vars.win); */
-	/* vars.win = mlx_new_window(vars.mlx, screen_width, screen_height, "Cub3D"); */
+	/* mlx_destroy_image(vars.mlx, img.img); */
+	/* img.img = mlx_new_image(vars.mlx, screen_width, screen_height); */
+	/* img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian); */
 	// speed modifiers
-	player->move_speed = 0.5; //frame_time * 5.0; // the constant value is squares / second
-	player->rot_speed = 0.06; //frame_time * 3.0; // the constant value is in radian / second
+	player->move_speed = 0.2; //frame_time * 5.0; // the constant value is squares / second
+	player->rot_speed = 0.03; //frame_time * 3.0; // the constant value is in radian / second
 
 	return 0;
 }
