@@ -142,7 +142,24 @@ int key_press(int keycode, t_player *player)
 		if (worldMap[(int)player->pos_x][(int)(player->pos_y - player->dir_y * player->move_speed)] == false)
 			player->pos_y -= player->dir_y * player->move_speed;
 	}
+
+	if (keycode == arrow_left)
+	{
+		
+		if (worldMap[(int)(player->pos_x + player->dir_y * player->move_speed)][(int)(player->pos_y)] == false)
+			player->pos_x += player->dir_y * player->move_speed;
+		if (worldMap[(int)(player->pos_x)][(int)(player->pos_y + player->dir_x * player->move_speed)] == false)
+			player->pos_y += player->dir_x * player->move_speed;
+	}
 	if (keycode == arrow_right)
+	{
+		if (worldMap[(int)(player->pos_x - player->dir_y * player->move_speed)][(int)(player->pos_y)] == false)
+			player->pos_x -= player->dir_y * player->move_speed;
+		if (worldMap[(int)player->pos_x][(int)(player->pos_y - player->dir_x * player->move_speed)] == false)
+			player->pos_y -= player->dir_x * player->move_speed;
+	}
+
+	if (keycode == d)
 	{
 		double old_dir_x = player->dir_x;
 		player->dir_x = player->dir_x * cos(-player->rot_speed) - player->dir_y * sin(-player->rot_speed);
@@ -151,7 +168,7 @@ int key_press(int keycode, t_player *player)
 		plane_x = plane_x * cos(-player->rot_speed) - plane_y * sin(-player->rot_speed);
 		plane_y = old_plane_x * sin(-player->rot_speed) + plane_y * cos(-player->rot_speed);
 	}
-	if (keycode == arrow_left)
+	if (keycode == a)
 	{
 		//both camera direction and camera plane must be rotated
 		double old_dir_x = player->dir_x;
@@ -264,7 +281,12 @@ int game_loop(t_player *player)
 		/* if (side == 1) color = color / 2; */
 
 		// texturing calculations
-		int tex_num = worldMap[map_x][map_y] - 1;
+		/* int tex_num = worldMap[map_x][map_y] - 1; */
+		int tex_num;
+		if (side == 1 && ray_dir_y > 0) tex_num = 1;
+		else if (side == 1 && ray_dir_y < 0) tex_num = 4;
+		else if (side == 0 && ray_dir_x > 0) tex_num = 3;
+		else tex_num = 6;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
@@ -338,7 +360,7 @@ int game_loop(t_player *player)
 	/* img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian); */
 	// speed modifiers
 	player->move_speed = 0.2; //frame_time * 5.0; // the constant value is squares / second
-	player->rot_speed = 0.03; //frame_time * 3.0; // the constant value is in radian / second
+	player->rot_speed = 0.06; //frame_time * 3.0; // the constant value is in radian / second
 
 	return 0;
 }
@@ -346,7 +368,7 @@ int game_loop(t_player *player)
 
 int		main(int argc, char *argv[argc])
 {
-	t_player player = {.pos_x = 22, .pos_y = 11.5, .dir_x = -1, .dir_y = 0};
+	t_player player = {.pos_x = 22, .pos_y = 11.5, .dir_x = -1.0, .dir_y = 0.0};
 	plane_x = 0;
 	plane_y = .66;
 	
