@@ -1,6 +1,5 @@
 #include "cub3D.h"
 #include "mlx/mlx.h"
-#include <math.h>
 
 typedef struct  s_vars {
 	void        *mlx;
@@ -66,6 +65,7 @@ double plane_x, plane_y; /*the 2D raycaster version of camera plane*/
 
 t_data textures[8];
 
+int draw(t_player *player);
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
 	if (y < screen_height && y >= 0)
@@ -178,11 +178,15 @@ int key_press(int keycode, t_player *player)
 		plane_x = plane_x * cos(player->rot_speed) - plane_y * sin(player->rot_speed);
 		plane_y = old_plane_x * sin(player->rot_speed) + plane_y * cos(player->rot_speed);
 	}
+	// TODO: don't forget to add escape and cross-red events which
+	// are quiting the game and cleaning after (imgs, textures, sprites...)
+
+	draw(player);
 	return 0;
 }
 
 
-int game_loop(t_player *player)
+int draw(t_player *player)
 {
 	for(int x = 0; x < screen_width; x++)
 	{
@@ -352,7 +356,7 @@ int game_loop(t_player *player)
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	for(int y = 0; y < screen_height; y++) for(int x = 0; x < screen_width; x++) my_mlx_pixel_put(&img, x, y, 0);
+	/* for(int y = 0; y < screen_height; y++) for(int x = 0; x < screen_width; x++) my_mlx_pixel_put(&img, x, y, 0); */
 	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
 	/* clear(); */
 	/* mlx_destroy_image(vars.mlx, img.img); */
@@ -401,9 +405,9 @@ int		main(int argc, char *argv[argc])
 
 	textures[7].img = mlx_xpm_file_to_image(vars.mlx, "../assets/colorstone.xpm", &textures[7].width, &textures[7].height);
 	textures[7].addr = (int *)mlx_get_data_addr(textures[7].img, &textures[7].bits_per_pixel, &textures[7].line_length, &textures[7].endian);
-	mlx_loop_hook(vars.mlx, game_loop, &player);
+	/* mlx_loop_hook(vars.mlx, game_loop, &player); */
+	draw(&player);
 
-	/* mlx_key_hook(vars.win, key_press, &player); */
 	mlx_hook(vars.win, 2, 0, key_press, &player);
 
 	mlx_loop(vars.mlx);
