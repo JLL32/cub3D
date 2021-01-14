@@ -127,9 +127,9 @@ void clear()
 int key_press(int keycode, t_player *player)
 {
 
+	//TODO: we'll have to make it check against characters of the map instead of numbers
 	if (keycode == arrow_up)
 	{
-		/* printf("%d\n", keycode); */
 		if (worldMap[(int)(player->pos_x + player->dir_x * player->move_speed)][(int)(player->pos_y)] == false)
 			player->pos_x += player->dir_x * player->move_speed;
 		if (worldMap[(int)(player->pos_x)][(int)(player->pos_y + player->dir_y * player->move_speed)] == false)
@@ -143,20 +143,20 @@ int key_press(int keycode, t_player *player)
 			player->pos_y -= player->dir_y * player->move_speed;
 	}
 
-	if (keycode == arrow_left)
-	{
-		
-		if (worldMap[(int)(player->pos_x + player->dir_y * player->move_speed)][(int)(player->pos_y)] == false)
-			player->pos_x += player->dir_y * player->move_speed;
-		if (worldMap[(int)(player->pos_x)][(int)(player->pos_y + player->dir_x * player->move_speed)] == false)
-			player->pos_y += player->dir_x * player->move_speed;
-	}
 	if (keycode == arrow_right)
 	{
-		if (worldMap[(int)(player->pos_x - player->dir_y * player->move_speed)][(int)(player->pos_y)] == false)
-			player->pos_x -= player->dir_y * player->move_speed;
-		if (worldMap[(int)player->pos_x][(int)(player->pos_y - player->dir_x * player->move_speed)] == false)
-			player->pos_y -= player->dir_x * player->move_speed;
+		
+		if (worldMap[(int)(player->pos_x + plane_x * player->move_speed)][(int)(player->pos_y)] == false)
+			player->pos_x += plane_x * player->move_speed;
+		if (worldMap[(int)(player->pos_x)][(int)(player->pos_y + plane_y * player->move_speed)] == false)
+			player->pos_y += plane_y * player->move_speed;
+	}
+	if (keycode == arrow_left)
+	{
+		if (worldMap[(int)(player->pos_x - plane_x * player->move_speed)][(int)(player->pos_y)] == false)
+			player->pos_x -= plane_x * player->move_speed;
+		if (worldMap[(int)player->pos_x][(int)(player->pos_y - plane_y * player->move_speed)] == false)
+			player->pos_y -= plane_y * player->move_speed;
 	}
 
 	if (keycode == d)
@@ -286,7 +286,7 @@ int game_loop(t_player *player)
 		if (side == 1 && ray_dir_y > 0) tex_num = 1;
 		else if (side == 1 && ray_dir_y < 0) tex_num = 4;
 		else if (side == 0 && ray_dir_x > 0) tex_num = 3;
-		else tex_num = 6;
+		else tex_num = 7;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit

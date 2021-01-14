@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#define screen_width 640
-#define screen_height 480
+#define screen_width 1200
+#define screen_height 600
 #define tex_width 64
 #define tex_height 64
 #define map_width 24
