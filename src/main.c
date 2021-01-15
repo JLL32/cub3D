@@ -1,5 +1,6 @@
 #include "cub3D.h"
 #include "mlx/mlx.h"
+#include <stdlib.h>
 
 typedef struct  s_vars {
 	void        *mlx;
@@ -65,6 +66,40 @@ double plane_x, plane_y; /*the 2D raycaster version of camera plane*/
 
 t_data textures[8];
 
+typedef struct s_sprite
+{
+	double x;
+	double y;
+	int texture;
+} t_sprite;
+
+#define num_sprites 8
+
+t_sprite sprite[num_sprites] =
+{
+	//some pillars around the map
+	{21.5, 1.5, 7},
+	{15.5, 1.5, 7},
+	{16.0, 1.8, 7},
+	{16.2, 1.2, 7},
+	{3.5,  2.5, 7},
+	{9.5, 15.5, 7},
+	{10.0, 15.1,7},
+	{10.5, 15.8,7},
+};
+
+unsigned int buffer[screen_height][screen_width]; // y-coordinates first because it works per scanline
+
+// 1D ZBuffer
+double z_buffer[screen_width];
+
+// arrays used to sort the sprites
+int sprite_order[num_sprites];
+double sprite_distance[num_sprites];
+
+// function used to sort the sprites
+void sort_sprites(int *order, double *dist, int amount);
+
 int draw(t_player *player);
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
@@ -113,6 +148,7 @@ void vertical_line(int x, int draw_start, int draw_end, t_hex_color color, t_var
 		y++;
 	}
 }
+
 void clear()
 {
 	int y = 0;
@@ -183,6 +219,45 @@ int key_press(int keycode, t_player *player)
 
 	draw(player);
 	return 0;
+}
+
+//sort algorithm
+//sort the sprites based on distance
+typedef struct s_pair {
+	double first;
+	int second;
+} t_pair;
+
+void swap(t_pair *xp, t_pair *yp)
+{
+    t_pair temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+// A function to implement bubble sort
+void pair_sort(t_pair arr[], int n)
+{
+	int i, j;
+	for (i = 0; i < n-1; i++)
+		for (j = 0; j < n-i-1; j++)
+			if (arr[j].first < arr[j+1].first)
+				swap(&arr[j], &arr[j+1]);
+}
+
+void sort_sprites(int* order, double* dist, int amount)
+{
+	/* std::vector<std::pair<double, int>> sprites(amount); */
+	t_pair sprites[amount];
+	for(int i = 0; i < amount; i++) {
+		sprites[i].first = dist[i];
+		sprites[i].second = order[i];
+	}
+	pair_sort(sprites, amount);
+	// restore in reverse order to go from farthest to nearest
+	for(int i = 0; i < amount; i++) {
+		dist[i] = sprites[amount - i - 1].first;
+		order[i] = sprites[amount - i - 1].second;
+	}
 }
 
 
@@ -290,7 +365,7 @@ int draw(t_player *player)
 		if (side == 1 && ray_dir_y > 0) tex_num = 1;
 		else if (side == 1 && ray_dir_y < 0) tex_num = 4;
 		else if (side == 0 && ray_dir_x > 0) tex_num = 3;
-		else tex_num = 7;
+		else tex_num = 5;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
@@ -351,12 +426,75 @@ int draw(t_player *player)
 			y++;
 		}
 
-		/* vertical_line(x, draw_start, draw_end, color, vars, &img); */
+		z_buffer[x] = perp_wall_dist;
 	}
+	// sprite casting
+	// sorts sprites from for to close
+	for (int i = 0; i < num_sprites; i++)
+	{
+		sprite_order[i] = i;
+		sprite_distance[i] = ((player->pos_x - sprite[i].x) * (player->pos_x - sprite[i].x) + (player->pos_y - sprite[i].y) * (player->pos_y - sprite[i].y));
+	}
+	sort_sprites(sprite_order, sprite_distance, num_sprites);
+
+	// after sorting the sprites do the projection and draw them
+	for (int i = 0; i < num_sprites; i++)
+	{
+		// translate sprite position to relative to camera
+		double sprite_x = sprite[sprite_order[i]].x - player->pos_x;
+		double sprite_y = sprite[sprite_order[i]].y - player->pos_y;
+
+		//transform sprite with the inverse camera matrix
+		// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+		// [ planeY   dirY ]                                          [ -planeY  planeX ]
+		double inv_det = 1.0 / (plane_x * player->dir_y - player->dir_x * plane_y); // required for correct matrix multiplication
+
+		double transform_x = inv_det * (player->dir_y * sprite_x - player->dir_x * sprite_y);
+		double transform_y = inv_det * (-plane_y * sprite_x + plane_x * sprite_y);
+
+		int sprite_screen_x = (int)((screen_width / 2.0) * (1 + transform_x / transform_y));
+
+		// calculate the height of the sprite on screen
+		int sprite_height = abs((int)(screen_height / (transform_y)));
+
+		// calculate the lowest and highest pixels to fill in current stripe
+		int draw_start_y = -sprite_height / 2 + screen_height / 2;
+		if(draw_start_y < 0) draw_start_y = 0;
+		int draw_end_y = sprite_height / 2 + screen_height / 2;
+		if(draw_end_y >= screen_height) draw_end_y = screen_height - 1;
+
+		//calculate width of the sprite
+		int sprite_width = abs((int)(screen_height / (transform_y)));
+		int draw_start_x = -sprite_width / 2 + sprite_screen_x;
+		if(draw_start_x < 0) draw_start_x = 0;
+		int draw_end_x = sprite_width / 2 + sprite_screen_x;
+		if(draw_end_x >= w) draw_end_x = screen_width - 1;
+
+		//loop through every vertical stripe of the sprite on screen
+		for(int stripe = draw_start_x; stripe < draw_end_x; stripe++)
+		{
+			int tex_x = (int)(256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * tex_width / sprite_width) / 256;
+			//the conditions in the if are:
+			//1) it's in front of camera plane so you don't see things behind you
+			//2) it's on the screen (left)
+			//3) it's on the screen (right)
+			//4) ZBuffer, with perpendicular distance
+			if(transform_y > 0 && stripe > 0 && stripe < w && transform_y < z_buffer[stripe])
+			for(int y = draw_start_y; y < draw_end_y; y++) //for every pixel of the current stripe
+			{
+				int d = (y) * 256 - screen_height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
+				int tex_y = ((d * tex_height) / sprite_height) / 256;
+				unsigned int color = textures[sprite[sprite_order[i]].texture].addr[tex_width * tex_y + tex_x]; //get current color from the texture
+				if((color & 0x00FFFFFF) != 0) my_mlx_pixel_put(&img, y, stripe, color);//paint pixel if it isn't black, black is the invisible color
+			}
+		}
+	}
+
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	/* for(int y = 0; y < screen_height; y++) for(int x = 0; x < screen_width; x++) my_mlx_pixel_put(&img, x, y, 0); */
+	for(int y = 0; y < screen_height; y++) for(int x = 0; x < screen_width; x++) my_mlx_pixel_put(&img, x, y, 0);
 	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
 	/* clear(); */
 	/* mlx_destroy_image(vars.mlx, img.img); */
@@ -403,7 +541,7 @@ int		main(int argc, char *argv[argc])
 	textures[6].img = mlx_xpm_file_to_image(vars.mlx, "../assets/wood.xpm", &textures[6].width, &textures[6].height);
 	textures[6].addr = (int *)mlx_get_data_addr(textures[6].img, &textures[6].bits_per_pixel, &textures[6].line_length, &textures[6].endian);
 
-	textures[7].img = mlx_xpm_file_to_image(vars.mlx, "../assets/colorstone.xpm", &textures[7].width, &textures[7].height);
+	textures[7].img = mlx_xpm_file_to_image(vars.mlx, "../assets/pillar.xpm", &textures[7].width, &textures[7].height);
 	textures[7].addr = (int *)mlx_get_data_addr(textures[7].img, &textures[7].bits_per_pixel, &textures[7].line_length, &textures[7].endian);
 	/* mlx_loop_hook(vars.mlx, game_loop, &player); */
 	draw(&player);
