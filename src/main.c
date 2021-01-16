@@ -64,7 +64,7 @@ typedef struct s_texture {
 
 double plane_x, plane_y; /*the 2D raycaster version of camera plane*/
 
-t_data textures[8];
+t_data textures[5];
 
 typedef struct s_sprite
 {
@@ -78,14 +78,14 @@ typedef struct s_sprite
 t_sprite sprite[num_sprites] =
 {
 	//some pillars around the map
-	{21.5, 1.5, 7},
-	{15.5, 1.5, 7},
-	{16.0, 1.8, 7},
-	{16.2, 1.2, 7},
-	{3.5,  2.5, 7},
-	{9.5, 15.5, 7},
-	{10.0, 15.1,7},
-	{10.5, 15.8,7},
+	{21.5, 1.5, 4},
+	{15.5, 1.5, 4},
+	{16.0, 1.8, 4},
+	{16.2, 1.2, 4},
+	{3.5,  2.5, 4},
+	{9.5, 15.5, 4},
+	{10.0, 15.1,4},
+	{10.5, 15.8,4},
 };
 
 unsigned int buffer[screen_height][screen_width]; // y-coordinates first because it works per scanline
@@ -345,27 +345,11 @@ int draw(t_player *player)
 		int draw_end = line_height / 2 + screen_height / 2;
 		if (draw_end >= screen_height) draw_end = screen_height - 1;
 		
-		// choose wall color
-		/* t_hex_color color; */
-		/* switch(worldMap[map_x][map_y]) */
-		/* { */
-		/* case 1:  color = red;  break; */
-		/* case 2:  color = green;  break; */
-		/* case 3:  color = blue;   break; */
-		/* case 4:  color = white;  break; */
-		/* default: color = yellow; break; */
-		/* } */
-		
-		/* // gives x and y different brightness */
-		/* if (side == 1) color = color / 2; */
-
-		// texturing calculations
-		/* int tex_num = worldMap[map_x][map_y] - 1; */
 		int tex_num;
-		if (side == 1 && ray_dir_y > 0) tex_num = 1;
-		else if (side == 1 && ray_dir_y < 0) tex_num = 4;
-		else if (side == 0 && ray_dir_x > 0) tex_num = 3;
-		else tex_num = 5;
+		if (side == 1 && ray_dir_y > 0) tex_num = 0;
+		else if (side == 1 && ray_dir_y < 0) tex_num = 2;
+		else if (side == 0 && ray_dir_x > 0) tex_num = 1;
+		else tex_num = 3;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
@@ -382,26 +366,6 @@ int draw(t_player *player)
 		double step = 1.0 * tex_height / line_height;
 		// Starting texture coordinat
 		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * step;
-
-		// draw ceiling
-		/* for (int y = 0; y <= draw_start; y++) */ 
-		/* { */
-		/* 	my_mlx_pixel_put(&img, x, y, light_blue); */
-		/* } */
-		/* for (int y = draw_start; y <= draw_end; y++) */
-		/* { */
-		/* 	// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow */
-		/* 	int text_y = (int)tex_pos & (tex_height - 1); */
-		/* 	tex_pos += step; */
-		/* 	int color = textures[tex_num].addr[tex_height * text_y + tex_x]; */
-		/* 	// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and */
-		/* 	if (side == 1) color = (color >> 1) & 8355711; */
-		/* 	my_mlx_pixel_put(&img, x, y, color); */
-		/* } */
-		/* for (int y = draw_end; y <= screen_height; y++) */
-		/* { */
-		/* 	my_mlx_pixel_put(&img, x, y, gray); */
-		/* } */
 
 		int y = 0;
 		while (y < draw_start)
@@ -495,15 +459,9 @@ int draw(t_player *player)
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
-	/* for(int y = 0; y < screen_height; y++) for(int x = 0; x < screen_width; x++) my_mlx_pixel_put(&img, x, y, 0); */
-	// TODO: clear the screen with a recycled image using mlx_put_image_to_window
-	/* clear(); */
-	/* mlx_destroy_image(vars.mlx, img.img); */
-	/* img.img = mlx_new_image(vars.mlx, screen_width, screen_height); */
-	/* img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian); */
 	// speed modifiers
-	player->move_speed = 0.2; //frame_time * 5.0; // the constant value is squares / second
-	player->rot_speed = 0.06; //frame_time * 3.0; // the constant value is in radian / second
+	player->move_speed = 0.2;
+	player->rot_speed = 0.06;
 
 	return 0;
 }
@@ -521,30 +479,22 @@ int		main(int argc, char *argv[argc])
 	img.img = mlx_new_image(vars.mlx, screen_width, screen_height);
 	img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
 
-	textures[0].img = mlx_xpm_file_to_image(vars.mlx, "../assets/eagle.xpm", &textures[0].width, &textures[0].height);
-	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 	
-	textures[1].img = mlx_xpm_file_to_image(vars.mlx, "../assets/redbrick.xpm", &textures[1].width, &textures[1].height);
+	textures[0].img = mlx_xpm_file_to_image(vars.mlx, "../assets/redbrick.xpm", &textures[0].width, &textures[0].height);
+	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
+
+	textures[1].img = mlx_xpm_file_to_image(vars.mlx, "../assets/greystone.xpm", &textures[1].width, &textures[1].height);
 	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
 
-	textures[2].img = mlx_xpm_file_to_image(vars.mlx, "../assets/purplestone.xpm", &textures[2].width, &textures[2].height);
+	textures[2].img = mlx_xpm_file_to_image(vars.mlx, "../assets/bluestone.xpm", &textures[2].width, &textures[2].height);
 	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
 
-	textures[3].img = mlx_xpm_file_to_image(vars.mlx, "../assets/greystone.xpm", &textures[3].width, &textures[3].height);
+	textures[3].img = mlx_xpm_file_to_image(vars.mlx, "../assets/mossy.xpm", &textures[3].width, &textures[3].height);
 	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
 
-	textures[4].img = mlx_xpm_file_to_image(vars.mlx, "../assets/bluestone.xpm", &textures[4].width, &textures[4].height);
+	textures[4].img = mlx_xpm_file_to_image(vars.mlx, "../assets/pillar.xpm", &textures[4].width, &textures[4].height);
 	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
 
-	textures[5].img = mlx_xpm_file_to_image(vars.mlx, "../assets/mossy.xpm", &textures[5].width, &textures[5].height);
-	textures[5].addr = (int *)mlx_get_data_addr(textures[5].img, &textures[5].bits_per_pixel, &textures[5].line_length, &textures[5].endian);
-
-	textures[6].img = mlx_xpm_file_to_image(vars.mlx, "../assets/wood.xpm", &textures[6].width, &textures[6].height);
-	textures[6].addr = (int *)mlx_get_data_addr(textures[6].img, &textures[6].bits_per_pixel, &textures[6].line_length, &textures[6].endian);
-
-	textures[7].img = mlx_xpm_file_to_image(vars.mlx, "../assets/pillar.xpm", &textures[7].width, &textures[7].height);
-	textures[7].addr = (int *)mlx_get_data_addr(textures[7].img, &textures[7].bits_per_pixel, &textures[7].line_length, &textures[7].endian);
-	/* mlx_loop_hook(vars.mlx, game_loop, &player); */
 	draw(&player);
 
 	mlx_hook(vars.win, 2, 0, key_press, &player);
