@@ -1,6 +1,4 @@
 #include "cub3D.h"
-#include "mlx/mlx.h"
-#include <stdlib.h>
 
 typedef struct  s_vars {
 	void        *mlx;
