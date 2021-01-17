@@ -1,7 +1,7 @@
 NAME = cub3D
 CC = clang
 FLAGS = -Wall -Wextra -Werror -g -fsanitize=address
-SRCS = src/main.c
+SRCS = src/main.c src/player.c
 INCL = src/cub3D.h
 MLX = ./mlx/Makefile
 
