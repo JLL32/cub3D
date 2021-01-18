@@ -96,6 +96,7 @@ int key_press(int keycode, t_player *player)
 		move_up(player);
 	if (keycode == KEY_DOWN)
 		move_down(player);
+
 	if (keycode == KEY_RIGHT)
 		move_right(player);
 	if (keycode == KEY_LEFT)
@@ -114,7 +115,7 @@ int key_press(int keycode, t_player *player)
 		mlx_destroy_image(vars.mlx, textures[3].img);
 		mlx_destroy_image(vars.mlx, textures[4].img);
 		mlx_destroy_image(vars.mlx, img.img);
-		mlx_clear_window(vars.mlx, vars.win);
+		mlx_destroy_window(vars.mlx, vars.win);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -255,6 +256,10 @@ int draw(t_player *player)
 			draw_end = screen_height - 1;
 
 		int tex_num;
+		// 0: north
+		// 1: south
+		// 2: west
+		// 3: east
 		if (side == 1 && ray_dir_y > 0)
 			tex_num = 0;
 		else if (side == 1 && ray_dir_y < 0)
