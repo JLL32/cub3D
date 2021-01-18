@@ -6,19 +6,15 @@ game {
 	mlx
 	win
 	win_buffer
-	screen
-	world_map
-	player {}
-	textures [4]
-	colors {}
 }
 
 env {
 	resolution {}
 	textures [4]
-	player {}
 	colors {}
 	world_map
+	player {}
+	sprites
 }
 
 cg {

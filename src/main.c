@@ -1,11 +1,6 @@
 #include "cub3D.h"
 #include <stdlib.h>
 
-typedef struct s_vars
-{
-	void *mlx;
-	void *win;
-} t_vars;
 
 typedef struct s_data
 {
@@ -17,6 +12,13 @@ typedef struct s_data
 	int line_length;
 	int endian;
 } t_data;
+
+typedef struct s_game
+{
+	void *mlx;
+	void *win;
+	t_data win_buffer;
+} t_game;
 
 typedef int t_hex_color;
 
@@ -33,9 +35,9 @@ enum colors
 	gray = 0x5A5A5A,
 };
 
-t_data img;
+/* t_data game.win_buffer; */
 
-t_vars vars;
+t_game game;
 
 typedef struct s_texture
 {
@@ -109,13 +111,13 @@ int key_press(int keycode, t_player *player)
 
 	if (keycode == KEY_ESC)
 	{
-		mlx_destroy_image(vars.mlx, textures[0].img);
-		mlx_destroy_image(vars.mlx, textures[1].img);
-		mlx_destroy_image(vars.mlx, textures[2].img);
-		mlx_destroy_image(vars.mlx, textures[3].img);
-		mlx_destroy_image(vars.mlx, textures[4].img);
-		mlx_destroy_image(vars.mlx, img.img);
-		mlx_destroy_window(vars.mlx, vars.win);
+		mlx_destroy_image(game.mlx, textures[0].img);
+		mlx_destroy_image(game.mlx, textures[1].img);
+		mlx_destroy_image(game.mlx, textures[2].img);
+		mlx_destroy_image(game.mlx, textures[3].img);
+		mlx_destroy_image(game.mlx, textures[4].img);
+		mlx_destroy_image(game.mlx, game.win_buffer.img);
+		mlx_destroy_window(game.mlx, game.win);
 		exit(EXIT_SUCCESS);
 	}
 
@@ -292,7 +294,7 @@ int draw(t_player *player)
 		int y = 0;
 		while (y < draw_start)
 		{
-			my_mlx_pixel_put(&img, x, y, light_blue);
+			my_mlx_pixel_put(&game.win_buffer, x, y, light_blue);
 			y++;
 		}
 		while (y < draw_end)
@@ -304,12 +306,12 @@ int draw(t_player *player)
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
 			if (side == 1)
 				color = (color >> 1) & 8355711;
-			my_mlx_pixel_put(&img, x, y, color);
+			my_mlx_pixel_put(&game.win_buffer, x, y, color);
 			y++;
 		}
 		while (y < screen_height)
 		{
-			my_mlx_pixel_put(&img, x, y, gray);
+			my_mlx_pixel_put(&game.win_buffer, x, y, gray);
 			y++;
 		}
 
@@ -379,14 +381,14 @@ int draw(t_player *player)
 					int tex_y = ((d * tex_height) / sprite_height) / 256;
 					int color = textures[sprite[sprite_order[i]].texture].addr[tex_width * tex_y + tex_x]; //get current color from the texture
 					if ((color & 0x00FFFFFF) != 0)
-						my_mlx_pixel_put(&img, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+						my_mlx_pixel_put(&game.win_buffer, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
 				}
 		}
 	}
 
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
-	mlx_put_image_to_window(vars.mlx, vars.win, img.img, 0, 0);
+	mlx_put_image_to_window(game.mlx, game.win, game.win_buffer.img, 0, 0);
 	// speed modifiers
 	player->move_speed = 0.2;
 	player->rot_speed = 0.06;
@@ -398,31 +400,31 @@ int main(int argc, char *argv[argc])
 {
 	t_player player = create_player();
 
-	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, screen_width, screen_height, "Cub3D");
-	img.img = mlx_new_image(vars.mlx, screen_width, screen_height);
-	img.addr = (int *)mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+	game.mlx = mlx_init();
+	game.win = mlx_new_window(game.mlx, screen_width, screen_height, "Cub3D");
+	game.win_buffer.img = mlx_new_image(game.mlx, screen_width, screen_height);
+	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, &game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
 
-	textures[0].img = mlx_xpm_file_to_image(vars.mlx, "./assets/redbrick.xpm", &textures[0].width, &textures[0].height);
+	textures[0].img = mlx_xpm_file_to_image(game.mlx, "./assets/redbrick.xpm", &textures[0].width, &textures[0].height);
 	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 
-	textures[1].img = mlx_xpm_file_to_image(vars.mlx, "./assets/greystone.xpm", &textures[1].width, &textures[1].height);
+	textures[1].img = mlx_xpm_file_to_image(game.mlx, "./assets/greystone.xpm", &textures[1].width, &textures[1].height);
 	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
 
-	textures[2].img = mlx_xpm_file_to_image(vars.mlx, "./assets/bluestone.xpm", &textures[2].width, &textures[2].height);
+	textures[2].img = mlx_xpm_file_to_image(game.mlx, "./assets/bluestone.xpm", &textures[2].width, &textures[2].height);
 	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
 
-	textures[3].img = mlx_xpm_file_to_image(vars.mlx, "./assets/mossy.xpm", &textures[3].width, &textures[3].height);
+	textures[3].img = mlx_xpm_file_to_image(game.mlx, "./assets/mossy.xpm", &textures[3].width, &textures[3].height);
 	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
 
-	textures[4].img = mlx_xpm_file_to_image(vars.mlx, "./assets/pillar.xpm", &textures[4].width, &textures[4].height);
+	textures[4].img = mlx_xpm_file_to_image(game.mlx, "./assets/pillar.xpm", &textures[4].width, &textures[4].height);
 	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
 
 	draw(&player);
 
-	mlx_hook(vars.win, 2, 0, key_press, &player);
+	mlx_hook(game.win, 2, 0, key_press, &player);
 
-	mlx_loop(vars.mlx);
+	mlx_loop(game.mlx);
 
 	return (0);
 }
