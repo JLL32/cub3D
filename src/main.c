@@ -1,43 +1,8 @@
 #include "cub3D.h"
 #include <stdlib.h>
 
-
-typedef struct s_data
-{
-	void *img;
-	int *addr;
-	int width;
-	int height;
-	int bits_per_pixel;
-	int line_length;
-	int endian;
-} t_data;
-
-typedef struct s_game
-{
-	void *mlx;
-	void *win;
-	t_data win_buffer;
-} t_game;
-
-typedef int t_hex_color;
-
-enum colors
-{
-	red = 0x0FF0000,
-	maroon = 0x0800000,
-	yellow = 0x0FFFF00,
-	blue = 0x00000FF,
-	white = 0xFFFFFFF,
-	green = 0x0008000,
-	black = 0x0000000,
-	light_blue = 0xADD8E6,
-	gray = 0x5A5A5A,
-};
-
-/* t_data game.win_buffer; */
-
-t_game game;
+#define GRAY 0x5A5A5A
+#define SKY_BLUE 0xADD8E6
 
 typedef struct s_texture
 {
@@ -70,11 +35,6 @@ t_sprite sprite[num_sprites] =
 		{10.5, 15.8, 4},
 };
 
-unsigned int buffer[screen_height][screen_width]; // y-coordinates first because it works per scanline
-
-// 1D ZBuffer
-double z_buffer[screen_width];
-
 // arrays used to sort the sprites
 int sprite_order[num_sprites];
 double sprite_distance[num_sprites];
@@ -82,18 +42,21 @@ double sprite_distance[num_sprites];
 // function used to sort the sprites
 void sort_sprites(int *order, double *dist, int amount);
 
-int draw(t_player *player);
-void my_mlx_pixel_put(t_data *data, int x, int y, int color)
+int draw(t_game *game);
+void my_mlx_pixel_put(t_game *game, int x, int y, int color)
 {
-	if (y < screen_height && y >= 0)
-		data->addr[(y)*screen_width + (x)] = color;
+	t_data *buffer = &game->win_buffer;
+	if (y < game->res.height && y >= 0)
+		buffer->addr[(y)*game->res.width + (x)] = color;
 }
 
 
-int key_press(int keycode, t_player *player)
+int key_press(int keycode, t_game *game)
 {
 
 	//TODO: we'll have to make it check against characters of the map instead of numbers
+	
+	t_player *player = &game->player;
 	if (keycode == KEY_UP)
 		move_up(player);
 	if (keycode == KEY_DOWN)
@@ -111,20 +74,20 @@ int key_press(int keycode, t_player *player)
 
 	if (keycode == KEY_ESC)
 	{
-		mlx_destroy_image(game.mlx, textures[0].img);
-		mlx_destroy_image(game.mlx, textures[1].img);
-		mlx_destroy_image(game.mlx, textures[2].img);
-		mlx_destroy_image(game.mlx, textures[3].img);
-		mlx_destroy_image(game.mlx, textures[4].img);
-		mlx_destroy_image(game.mlx, game.win_buffer.img);
-		mlx_destroy_window(game.mlx, game.win);
+		mlx_destroy_image(game->mlx, textures[0].img);
+		mlx_destroy_image(game->mlx, textures[1].img);
+		mlx_destroy_image(game->mlx, textures[2].img);
+		mlx_destroy_image(game->mlx, textures[3].img);
+		mlx_destroy_image(game->mlx, textures[4].img);
+		mlx_destroy_image(game->mlx, game->win_buffer.img);
+		mlx_destroy_window(game->mlx, game->win);
 		exit(EXIT_SUCCESS);
 	}
 
 	// TODO: don't forget to add escape and cross-red events which
 	// are quiting the game and cleaning after (imgs, textures, sprites...)
 
-	draw(player);
+	draw(game);
 	return 0;
 }
 
@@ -170,8 +133,52 @@ void sort_sprites(int *order, double *dist, int amount)
 	}
 }
 
-int draw(t_player *player)
+t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_map **string*/)
 {
+	int camera_x;
+	t_coordinate ray_dir;
+	t_square map_pos;
+	t_coordinate side_dist;
+	t_coordinate delta_dist;
+	t_square step; //what direction to step in x or y-direction (either +1 or -1)
+	int hit; //was there a wall hit?
+	int side;//was a NS or a EW wall hit?
+	
+	//calculate ray position and direction
+	camera_x = 2 * x / (double)res.height - 1; //x-coordinate in camera space
+	ray_dir.x = player->dir_x + player->plane_x * camera_x;
+	ray_dir.y = player->dir_y + player->plane_y * camera_x;
+
+	map_pos.x = (int)player->pos_x;
+	map_pos.y = (int)player->pos_y;
+
+	double delta_dist_x = fabs(1.0 / ray_dir.x);
+	double delta_dist_y = fabs(1.0 / ray_dir.y);
+	double perp_wall_dist;
+
+	
+	int step_x;
+	int step_y;
+
+	hit = 0;
+
+	return ((t_wall_stripe){
+	
+			.dist = 10});
+}
+
+int draw(t_game *game)
+{
+	t_player *player = &game->player;
+	int screen_height = game->res.height;
+	int screen_width = game->res.width;
+
+	// y-coordinates first because it works per scanline
+	/* unsigned int buffer[screen_height][screen_width]; */ 
+
+	// 1D ZBuffer
+	double z_buffer[screen_width];
+
 	for (int x = 0; x < screen_width; x++)
 	{
 		//calculate ray position and direction
@@ -246,9 +253,17 @@ int draw(t_player *player)
 			perp_wall_dist = (map_x - player->pos_x + (1.0 - step_x) / 2) / ray_dir_x;
 		else
 			perp_wall_dist = (map_y - player->pos_y + (1.0 - step_y) / 2) / ray_dir_y;
+
+		// calculate the value of wall_x
+		double wall_x; // where exactly the wall was hit
+		if (side == 0)
+			wall_x = player->pos_y + perp_wall_dist * ray_dir_y;
+		else
+			wall_x = player->pos_x + perp_wall_dist * ray_dir_x;
+		wall_x -= floor(wall_x);
+
 		/* calculate line_height */
 		int line_height = (int)(screen_height / perp_wall_dist);
-
 		/*calculate the lowest and highest pixel fo fill in the current stripe*/
 		int draw_start = -line_height / 2 + screen_height / 2;
 		if (draw_start < 0)
@@ -256,6 +271,20 @@ int draw(t_player *player)
 		int draw_end = line_height / 2 + screen_height / 2;
 		if (draw_end >= screen_height)
 			draw_end = screen_height - 1;
+
+		// side % 2 != 0
+		// side % 2 == 0
+		// x coordinate on the texture
+		int tex_x = (int)(wall_x * (double)(tex_width));
+		if (side == 0 && ray_dir_x > 0)
+			tex_x = tex_width - tex_x - 1;
+		if (side == 1 && ray_dir_y < 0)
+			tex_x = tex_width - tex_x - 1;
+
+		// How much to increase the texture coordinate per screen pixel
+		double step = 1.0 * tex_height / line_height;
+		// Starting texture coordinat
+		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * step;
 
 		int tex_num;
 		// 0: north
@@ -271,30 +300,10 @@ int draw(t_player *player)
 		else
 			tex_num = 3;
 
-		// calculate the value of wall_x
-		double wall_x; // where exactly the wall was hit
-		if (side == 0)
-			wall_x = player->pos_y + perp_wall_dist * ray_dir_y;
-		else
-			wall_x = player->pos_x + perp_wall_dist * ray_dir_x;
-		wall_x -= floor(wall_x);
-
-		// x coordinate on the texture
-		int tex_x = (int)(wall_x * (double)(tex_width));
-		if (side == 0 && ray_dir_x > 0)
-			tex_x = tex_width - tex_x - 1;
-		if (side == 1 && ray_dir_y < 0)
-			tex_x = tex_width - tex_x - 1;
-
-		// How much to increase the texture coordinate per screen pixel
-		double step = 1.0 * tex_height / line_height;
-		// Starting texture coordinat
-		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * step;
-
 		int y = 0;
 		while (y < draw_start)
 		{
-			my_mlx_pixel_put(&game.win_buffer, x, y, light_blue);
+			my_mlx_pixel_put(game, x, y, game->colors.ceiling);
 			y++;
 		}
 		while (y < draw_end)
@@ -306,12 +315,12 @@ int draw(t_player *player)
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
 			if (side == 1)
 				color = (color >> 1) & 8355711;
-			my_mlx_pixel_put(&game.win_buffer, x, y, color);
+			my_mlx_pixel_put(game, x, y, color);
 			y++;
 		}
 		while (y < screen_height)
 		{
-			my_mlx_pixel_put(&game.win_buffer, x, y, gray);
+			my_mlx_pixel_put(game, x, y, game->colors.floor);
 			y++;
 		}
 
@@ -381,14 +390,14 @@ int draw(t_player *player)
 					int tex_y = ((d * tex_height) / sprite_height) / 256;
 					int color = textures[sprite[sprite_order[i]].texture].addr[tex_width * tex_y + tex_x]; //get current color from the texture
 					if ((color & 0x00FFFFFF) != 0)
-						my_mlx_pixel_put(&game.win_buffer, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+						my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
 				}
 		}
 	}
 
 	//Updates the screen.  Has to be called to view new pixels, but use only after
 	//drawing the whole screen because it's slow.
-	mlx_put_image_to_window(game.mlx, game.win, game.win_buffer.img, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
 	// speed modifiers
 	player->move_speed = 0.2;
 	player->rot_speed = 0.06;
@@ -398,11 +407,14 @@ int draw(t_player *player)
 
 int main(int argc, char *argv[argc])
 {
-	t_player player = create_player();
+	t_game game;
+	game.player = create_player();
+	game.colors = (t_colors){.ceiling = SKY_BLUE, .floor = GRAY};
+	game.res = (t_resolution){.height = 780, .width = 1080};
 
 	game.mlx = mlx_init();
-	game.win = mlx_new_window(game.mlx, screen_width, screen_height, "Cub3D");
-	game.win_buffer.img = mlx_new_image(game.mlx, screen_width, screen_height);
+	game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
+	game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
 	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, &game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
 
 	textures[0].img = mlx_xpm_file_to_image(game.mlx, "./assets/redbrick.xpm", &textures[0].width, &textures[0].height);
@@ -420,9 +432,9 @@ int main(int argc, char *argv[argc])
 	textures[4].img = mlx_xpm_file_to_image(game.mlx, "./assets/pillar.xpm", &textures[4].width, &textures[4].height);
 	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
 
-	draw(&player);
+	draw(&game);
 
-	mlx_hook(game.win, 2, 0, key_press, &player);
+	mlx_hook(game.win, 2, 0, key_press, &game);
 
 	mlx_loop(game.mlx);
 

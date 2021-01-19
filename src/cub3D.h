@@ -6,9 +6,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/_types/_size_t.h>
 
-# define screen_width 1200
-# define screen_height 600
+/* # define screen_width 1200 */
+/* # define screen_height 600 */
 # define tex_width 64
 # define tex_height 64
 # define map_width 24
@@ -52,6 +53,17 @@ static const int world_map[map_width][map_height]=
   {2,2,2,2,1,2,2,2,2,2,2,1,2,2,2,5,5,5,5,5,5,5,5,5}
 };
 
+typedef struct s_data
+{
+	void *img;
+	int *addr;
+	int width;
+	int height;
+	int bits_per_pixel;
+	int line_length;
+	int endian;
+} t_data;
+
 typedef struct s_player {
 	double pos_x;
 	double pos_y;
@@ -62,6 +74,46 @@ typedef struct s_player {
 	double plane_x;
 	double plane_y;
 } t_player;
+
+typedef struct s_resolution {
+	int height;
+	int width;
+} t_resolution;
+
+typedef struct s_colors {
+	int floor;
+	int ceiling;
+} t_colors;
+
+typedef struct s_game
+{
+	void *mlx;
+	void *win;
+	t_data win_buffer;
+	t_player player;
+	t_colors colors;
+	t_resolution res;
+} t_game;
+
+typedef struct s_coordinate {
+	double x;
+	double y;
+} t_coordinate;
+
+typedef struct s_square {
+	int x;
+	int y;
+} t_square;
+
+typedef struct s_wall_stripe
+{
+	double dist;
+	int side;
+	int wall_x;
+	int start;
+	int end;
+} t_wall_stripe;
+
 
 t_player create_player();
 void move_up(t_player *player);

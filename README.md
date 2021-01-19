@@ -6,6 +6,7 @@ game {
 	mlx
 	win
 	win_buffer
+	player {}
 }
 
 env {
@@ -13,7 +14,6 @@ env {
 	textures [4]
 	colors {}
 	world_map
-	player {}
 	sprites
 }
 
@@ -23,6 +23,7 @@ cg {
 	win_buffer
 }
 
+# Engine
 camera_x
 
 ray_dir {
@@ -45,15 +46,12 @@ delta_dist {
 	y = fabs(1.0 / ray_dir_y)
 }
 
-wall_collision {
+wall {
 	dist
 	side
+	wall_x
 }
 
-perp_wall_dist(player, screen, world_map) -> wall_collision
-
-wall_x(perp_wall_dist, ray) -> int
-
-tex_x(wall_x, perp_wall_dist, side) -> int
-
+detect_wall(player, screen, world_map) -> wall
+draw_wall() -> void
 
