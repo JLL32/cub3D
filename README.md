@@ -50,6 +50,8 @@ wall {
 	dist
 	side
 	wall_x
+	start
+	end
 }
 
 detect_wall(player, screen, world_map) -> wall
