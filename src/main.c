@@ -266,6 +266,7 @@ t_coordinate get_delta_dist(t_coordinate ray_dir)
 	return ((t_coordinate){fabs(1.0 / ray_dir.x), fabs(1.0 / ray_dir.y)});
 }
 
+//length of ray from current position to next x or y-side
 t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 		t_square map, t_player player)
 {
@@ -287,8 +288,10 @@ t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 	{
 		side_dist.y = (map.y + 1.0 - player.pos_y) * delta_dist.y;
 	}
-	return side_dist; }
+	return side_dist;
+}
 
+//what direction to step in x or y-direction (either +1 or -1)
 t_square get_step_dir(t_coordinate ray_dir)
 {
 	t_square step_dir;
@@ -365,13 +368,19 @@ int draw(t_game *game)
 			{
 				side_dist.x += delta_dist.x;
 				map.x += step_dir.x;
-				side = 0;
+				if (ray_dir.x > 0)
+					side = 0;
+				else
+					side = 2;
 			}
 			else
 			{
 				side_dist.y += delta_dist.y;
 				map.y += step_dir.y;
-				side = 1;
+				if (ray_dir.y > 0)
+					side = 1;
+				else
+					side = 3;
 			}
 			/*check if ray has hit a wall*/
 			if (world_map[map.x][map.y] > 0)
@@ -379,14 +388,14 @@ int draw(t_game *game)
 		}
 		/*Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
 		double perp_wall_dist;
-		if (side == 0)
+		if (side % 2 == 0)
 			perp_wall_dist = (map.x - player->pos_x + (1.0 - step_dir.x) / 2) / ray_dir.x;
 		else
 			perp_wall_dist = (map.y - player->pos_y + (1.0 - step_dir.y) / 2) / ray_dir.y;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
-		if (side == 0)
+		if (side % 2 == 0)
 			wall_x = player->pos_y + perp_wall_dist * ray_dir.y;
 		else
 			wall_x = player->pos_x + perp_wall_dist * ray_dir.x;
@@ -406,9 +415,9 @@ int draw(t_game *game)
 		// side % 2 == 0
 		// x coordinate on the texture
 		int tex_x = (int)(wall_x * (double)(tex_width));
-		if (side == 0 && ray_dir.x > 0)
+		if (side == 0)
 			tex_x = tex_width - tex_x - 1;
-		if (side == 1 && ray_dir.y < 0)
+		if (side == 1)
 			tex_x = tex_width - tex_x - 1;
 
 		// How much to increase the texture coordinate per screen pixel
@@ -416,19 +425,19 @@ int draw(t_game *game)
 		// Starting texture coordinat
 		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * steps;
 
-		int tex_num;
+		int tex_num = side;
 		// 0: north
 		// 1: south
 		// 2: west
 		// 3: east
-		if (side == 1 && ray_dir.y > 0)
-			tex_num = 0;
-		else if (side == 1 && ray_dir.y < 0)
-			tex_num = 2;
-		else if (side == 0 && ray_dir.x > 0)
-			tex_num = 1;
-		else
-			tex_num = 3;
+		/* if (side == 1 && ray_dir.y > 0) */
+		/* 	tex_num = 0; */
+		/* else if (side == 1 && ray_dir.y < 0) */
+		/* 	tex_num = 2; */
+		/* else if (side == 0 && ray_dir.x > 0) */
+		/* 	tex_num = 1; */
+		/* else */
+		/* 	tex_num = 3; */
 
 		int y = 0;
 		while (y < draw_start)
@@ -443,7 +452,7 @@ int draw(t_game *game)
 			tex_pos += steps;
 			int color = textures[tex_num].addr[tex_height * text_y + tex_x];
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
-			if (side == 1)
+			if (side % 2 != 1)
 				color = (color >> 1) & 8355711;
 			my_mlx_pixel_put(game, x, y, color);
 			y++;
