@@ -23,16 +23,16 @@ typedef struct s_sprite
 #define num_sprites 8
 
 t_sprite sprite[num_sprites] =
-	{
-		//some pillars around the map
-		{21.5, 1.5, 4},
-		{15.5, 1.5, 4},
-		{16.0, 1.8, 4},
-		{16.2, 1.2, 4},
-		{3.5, 2.5, 4},
-		{9.5, 15.5, 4},
-		{10.0, 15.1, 4},
-		{10.5, 15.8, 4},
+{
+	//some pillars around the map
+	{21.5, 1.5, 4},
+	{15.5, 1.5, 4},
+	{16.0, 1.8, 4},
+	{16.2, 1.2, 4},
+	{3.5, 2.5, 4},
+	{9.5, 15.5, 4},
+	{10.0, 15.1, 4},
+	{10.5, 15.8, 4},
 };
 
 // arrays used to sort the sprites
@@ -135,108 +135,6 @@ void sort_sprites(int *order, double *dist, int amount)
 
 t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_map **string*/)
 {
-	int camera_x;
-	t_coordinate ray_dir;
-	t_square map_pos;
-	t_coordinate side_dist;
-	t_coordinate delta_dist;
-	t_square step; //what direction to step in x or y-direction (either +1 or -1)
-	int hit; //was there a wall hit?
-	int side;//was a NS or a EW wall hit?
-
-	
-	//calculate ray position and direction
-	camera_x = 2 * x / (double)res.height - 1; //x-coordinate in camera space
-	ray_dir.x = player->dir_x + player->plane_x * camera_x;
-	ray_dir.y = player->dir_y + player->plane_y * camera_x;
-
-	map_pos.x = (int)player->pos_x;
-	map_pos.y = (int)player->pos_y;
-
-	double delta_dist_x = fabs(1.0 / ray_dir.x);
-	double delta_dist_y = fabs(1.0 / ray_dir.y);
-	double perp_wall_dist;
-
-	
-	int step_x;
-	int step_y;
-
-	hit = 0;
-
-	if (ray_dir.x < 0)
-	{
-		step_x = -1;
-		side_dist.x = (player->pos_x - map_pos.x) * delta_dist.x;
-	}
-	else
-	{
-		step_x = 1;
-		side_dist.x = (map_pos.x + 1.0 - player->pos_x) * delta_dist_x;
-	}
-	if (ray_dir.y < 0)
-	{
-		step_y = -1;
-		side_dist.y = (player->pos_y - map_pos.y) * delta_dist.y;
-	}
-	else
-	{
-		step_y = 1;
-		side_dist.y = (map_pos.y + 1.0 - player->pos_y) * delta_dist_y;
-	}
-
-	/*perform DDA*/
-	// 0: west
-	// 1: north
-	// 2: east
-	// 3: south
-	while (hit == 0)
-	{
-		/*jump to next map square, or in x_direction, or in y-direction*/
-		if (side_dist.x < side_dist.y)
-		{
-			side_dist.x += delta_dist.x;
-			map_pos.x += step_x;
-			if (ray_dir.x > 0)
-				side = 0;
-			else
-				side = 2;
-		}
-		else
-		{
-			side_dist.y += delta_dist.y;
-			map_pos.y += step_y;
-			if (ray_dir.y > 0)
-				side = 1;
-			else
-				side = 3;
-		}
-		/*check if ray has hit a wall*/
-		if (world_map[map_pos.x][map_pos.y] > 0)
-			hit = 1;
-	}
-
-	if (side % 2 == 0)
-		perp_wall_dist = (map_pos.x - player->pos_x + (1.0 - step_x) / 2) / ray_dir.x;
-	else
-		perp_wall_dist = (map_pos.x - player->pos_y + (1.0 - step_y) / 2) / ray_dir.y;
-
-	// calculate the value of wall_x
-	double wall_x; // where exactly the wall was hit
-	if (side % 2 == 0)
-		wall_x = player->pos_y + perp_wall_dist * ray_dir.y;
-	else
-		wall_x = player->pos_x + perp_wall_dist * ray_dir.x;
-	wall_x -= floor(wall_x);
-
-	/* calculate line_height */
-	int line_height = (int)(res.height / perp_wall_dist);
-	/*calculate the lowest and highest pixel fo fill in the current stripe*/
-	int draw_start = -line_height / 2 + res.height / 2;
-	if (draw_start < 0)
-		draw_start = 0;
-	int draw_end = line_height / 2 + res.height / 2;
-	if (draw_end >= res.height)
-		draw_end = res.height - 1;
 
 	return ((t_wall_stripe){perp_wall_dist, side, wall_x, line_height});
 }
@@ -315,7 +213,6 @@ t_square get_step_dir(t_coordinate ray_dir)
 	return step_dir;
 }
 
-
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -349,8 +246,6 @@ int draw(t_game *game)
 		/* int step_y; */
 		
 
-		int hit = 0; //was there a wall hit?
-		int side;	 //was a NS or a EW wall hit?
 
 		//calculate step and initial side_dist
 		//length of ray from current position to next x or y-side
@@ -366,6 +261,8 @@ int draw(t_game *game)
 		// 1: north
 		// 2: east
 		// 3: south
+		int side;	 //was a NS or a EW wall hit?
+		int hit = 0; //was there a wall hit?
 		while (hit == 0)
 		{
 			/*jump to next map square, or in x_direction, or in y-direction*/

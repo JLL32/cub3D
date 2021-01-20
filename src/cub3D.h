@@ -110,8 +110,7 @@ typedef struct s_wall_stripe
 	double dist;
 	int side;
 	int wall_x;
-	int start;
-	int end;
+	int height;
 } t_wall_stripe;
 
 
