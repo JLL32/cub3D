@@ -402,9 +402,9 @@ int draw(t_game *game)
 			tex_x = tex_width - tex_x - 1;
 
 		// How much to increase the texture coordinate per screen pixel
-		double step = 1.0 * tex_height / line_height;
+		double steps = 1.0 * tex_height / line_height;
 		// Starting texture coordinat
-		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * step;
+		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * steps;
 
 		int tex_num;
 		// 0: north
@@ -430,7 +430,7 @@ int draw(t_game *game)
 		{
 			// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
 			int text_y = (int)tex_pos & (tex_height - 1);
-			tex_pos += step;
+			tex_pos += steps;
 			int color = textures[tex_num].addr[tex_height * text_y + tex_x];
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
 			if (side == 1)
