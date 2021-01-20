@@ -270,6 +270,7 @@ t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 		t_square map, t_player player)
 {
 	t_coordinate side_dist;
+
 	if (ray_dir.x < 0)
 	{
 		side_dist.x = (player.pos_x - map.x) * delta_dist.x;
@@ -286,7 +287,29 @@ t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 	{
 		side_dist.y = (map.y + 1.0 - player.pos_y) * delta_dist.y;
 	}
-	return side_dist;
+	return side_dist; }
+
+t_square get_step_dir(t_coordinate ray_dir)
+{
+	t_square step_dir;
+
+	if (ray_dir.x < 0)
+	{
+		step_dir.x = -1;
+	}
+	else
+	{
+		step_dir.x = 1;
+	}
+	if (ray_dir.y < 0)
+	{
+		step_dir.y = -1;
+	}
+	else
+	{
+		step_dir.y = 1;
+	}
+	return step_dir;
 }
 
 
@@ -318,11 +341,10 @@ int draw(t_game *game)
 		//length of ray from one x or y-side to next x or y-side
 		t_coordinate delta_dist;
 		delta_dist = get_delta_dist(ray_dir);
-		double perp_wall_dist;
 
-		//what direction to step in x or y-direction (either +1 or -1)
-		int step_x;
-		int step_y;
+		/* int step_x; */
+		/* int step_y; */
+		
 
 		int hit = 0; //was there a wall hit?
 		int side;	 //was a NS or a EW wall hit?
@@ -331,22 +353,9 @@ int draw(t_game *game)
 		//length of ray from current position to next x or y-side
 		t_coordinate side_dist;
 		side_dist = get_side_dist(delta_dist, ray_dir, map, *player);
-		if (ray_dir.x < 0)
-		{
-			step_x = -1;
-		}
-		else
-		{
-			step_x = 1;
-		}
-		if (ray_dir.y < 0)
-		{
-			step_y = -1;
-		}
-		else
-		{
-			step_y = 1;
-		}
+		//what direction to step in x or y-direction (either +1 or -1)
+		t_square step_dir;
+		step_dir = get_step_dir(ray_dir);
 
 		/*perform DDA*/
 		while (hit == 0)
@@ -355,13 +364,13 @@ int draw(t_game *game)
 			if (side_dist.x < side_dist.y)
 			{
 				side_dist.x += delta_dist.x;
-				map.x += step_x;
+				map.x += step_dir.x;
 				side = 0;
 			}
 			else
 			{
 				side_dist.y += delta_dist.y;
-				map.y += step_y;
+				map.y += step_dir.y;
 				side = 1;
 			}
 			/*check if ray has hit a wall*/
@@ -369,10 +378,11 @@ int draw(t_game *game)
 				hit = 1;
 		}
 		/*Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
+		double perp_wall_dist;
 		if (side == 0)
-			perp_wall_dist = (map.x - player->pos_x + (1.0 - step_x) / 2) / ray_dir.x;
+			perp_wall_dist = (map.x - player->pos_x + (1.0 - step_dir.x) / 2) / ray_dir.x;
 		else
-			perp_wall_dist = (map.y - player->pos_y + (1.0 - step_y) / 2) / ray_dir.y;
+			perp_wall_dist = (map.y - player->pos_y + (1.0 - step_dir.y) / 2) / ray_dir.y;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
