@@ -238,7 +238,19 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_ma
 	if (draw_end >= res.height)
 		draw_end = res.height - 1;
 
-	return ((t_wall_stripe){perp_wall_dist, side, wall_x, draw_start, draw_end});
+	return ((t_wall_stripe){perp_wall_dist, side, wall_x, line_height});
+}
+
+//calculate ray position and direction
+t_coordinate get_ray_dir(t_player *player, int win_width, int x)
+{
+	double camera_x;
+	t_coordinate ray_dir;
+
+	camera_x = 2 * x / (double)win_width - 1; //x-coordinate in camera space
+	ray_dir.x = player->dir_x + player->plane_x * camera_x;
+	ray_dir.y = player->dir_y + player->plane_y * camera_x;
+	return ray_dir;
 }
 
 int draw(t_game *game)
@@ -255,10 +267,8 @@ int draw(t_game *game)
 
 	for (int x = 0; x < screen_width; x++)
 	{
-		//calculate ray position and direction
-		double camera_x = 2 * x / (double)screen_width - 1; //x-coordinate in camera space
-		double ray_dir_x = player->dir_x + player->plane_x * camera_x;
-		double ray_dir_y = player->dir_y + player->plane_y * camera_x;
+		t_coordinate ray_dir;
+		ray_dir = get_ray_dir(player, game->res.width, x);
 
 		//which box of the map we're in
 		int map_x = (int)player->pos_x;
@@ -269,8 +279,8 @@ int draw(t_game *game)
 		double side_dist_y;
 
 		//length of ray from one x or y-side to next x or y-side
-		double delta_dist_x = fabs(1.0 / ray_dir_x);
-		double delta_dist_y = fabs(1.0 / ray_dir_y);
+		double delta_dist_x = fabs(1.0 / ray_dir.x);
+		double delta_dist_y = fabs(1.0 / ray_dir.y);
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -281,7 +291,7 @@ int draw(t_game *game)
 		int side;	 //was a NS or a EW wall hit?
 
 		//calculate step and initial side_dist
-		if (ray_dir_x < 0)
+		if (ray_dir.x < 0)
 		{
 			step_x = -1;
 			side_dist_x = (player->pos_x - map_x) * delta_dist_x;
@@ -291,7 +301,7 @@ int draw(t_game *game)
 			step_x = 1;
 			side_dist_x = (map_x + 1.0 - player->pos_x) * delta_dist_x;
 		}
-		if (ray_dir_y < 0)
+		if (ray_dir.y < 0)
 		{
 			step_y = -1;
 			side_dist_y = (player->pos_y - map_y) * delta_dist_y;
@@ -324,16 +334,16 @@ int draw(t_game *game)
 		}
 		/*Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
 		if (side == 0)
-			perp_wall_dist = (map_x - player->pos_x + (1.0 - step_x) / 2) / ray_dir_x;
+			perp_wall_dist = (map_x - player->pos_x + (1.0 - step_x) / 2) / ray_dir.x;
 		else
-			perp_wall_dist = (map_y - player->pos_y + (1.0 - step_y) / 2) / ray_dir_y;
+			perp_wall_dist = (map_y - player->pos_y + (1.0 - step_y) / 2) / ray_dir.y;
 
 		// calculate the value of wall_x
 		double wall_x; // where exactly the wall was hit
 		if (side == 0)
-			wall_x = player->pos_y + perp_wall_dist * ray_dir_y;
+			wall_x = player->pos_y + perp_wall_dist * ray_dir.y;
 		else
-			wall_x = player->pos_x + perp_wall_dist * ray_dir_x;
+			wall_x = player->pos_x + perp_wall_dist * ray_dir.x;
 		wall_x -= floor(wall_x);
 
 		/* calculate line_height */
@@ -350,9 +360,9 @@ int draw(t_game *game)
 		// side % 2 == 0
 		// x coordinate on the texture
 		int tex_x = (int)(wall_x * (double)(tex_width));
-		if (side == 0 && ray_dir_x > 0)
+		if (side == 0 && ray_dir.x > 0)
 			tex_x = tex_width - tex_x - 1;
-		if (side == 1 && ray_dir_y < 0)
+		if (side == 1 && ray_dir.y < 0)
 			tex_x = tex_width - tex_x - 1;
 
 		// How much to increase the texture coordinate per screen pixel
@@ -365,11 +375,11 @@ int draw(t_game *game)
 		// 1: south
 		// 2: west
 		// 3: east
-		if (side == 1 && ray_dir_y > 0)
+		if (side == 1 && ray_dir.y > 0)
 			tex_num = 0;
-		else if (side == 1 && ray_dir_y < 0)
+		else if (side == 1 && ray_dir.y < 0)
 			tex_num = 2;
-		else if (side == 0 && ray_dir_x > 0)
+		else if (side == 0 && ray_dir.x > 0)
 			tex_num = 1;
 		else
 			tex_num = 3;
