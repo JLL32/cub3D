@@ -361,6 +361,11 @@ int draw(t_game *game)
 		step_dir = get_step_dir(ray_dir);
 
 		/*perform DDA*/
+		// side depends on what direction the wall faces
+		// 0: west
+		// 1: north
+		// 2: east
+		// 3: south
 		while (hit == 0)
 		{
 			/*jump to next map square, or in x_direction, or in y-direction*/
@@ -378,9 +383,9 @@ int draw(t_game *game)
 				side_dist.y += delta_dist.y;
 				map.y += step_dir.y;
 				if (ray_dir.y > 0)
-					side = 1;
-				else
 					side = 3;
+				else
+					side = 1;
 			}
 			/*check if ray has hit a wall*/
 			if (world_map[map.x][map.y] > 0)
