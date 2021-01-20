@@ -266,6 +266,29 @@ t_coordinate get_delta_dist(t_coordinate ray_dir)
 	return ((t_coordinate){fabs(1.0 / ray_dir.x), fabs(1.0 / ray_dir.y)});
 }
 
+t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
+		t_square map, t_player player)
+{
+	t_coordinate side_dist;
+	if (ray_dir.x < 0)
+	{
+		side_dist.x = (player.pos_x - map.x) * delta_dist.x;
+	}
+	else
+	{
+		side_dist.x = (map.x + 1.0 - player.pos_x) * delta_dist.x;
+	}
+	if (ray_dir.y < 0)
+	{
+		side_dist.y = (player.pos_y - map.y) * delta_dist.y;
+	}
+	else
+	{
+		side_dist.y = (map.y + 1.0 - player.pos_y) * delta_dist.y;
+	}
+	return side_dist;
+}
+
 
 int draw(t_game *game)
 {
@@ -289,7 +312,6 @@ int draw(t_game *game)
 		t_square map;
 		map = pos_to_map_pos(*player);
 
-		//length of ray from current position to next x or y-side
 		/* double side_dist_x; */
 		/* double side_dist_y; */
 
@@ -306,26 +328,24 @@ int draw(t_game *game)
 		int side;	 //was a NS or a EW wall hit?
 
 		//calculate step and initial side_dist
+		//length of ray from current position to next x or y-side
 		t_coordinate side_dist;
+		side_dist = get_side_dist(delta_dist, ray_dir, map, *player);
 		if (ray_dir.x < 0)
 		{
 			step_x = -1;
-			side_dist.x = (player->pos_x - map.x) * delta_dist.x;
 		}
 		else
 		{
 			step_x = 1;
-			side_dist.x = (map.x + 1.0 - player->pos_x) * delta_dist.x;
 		}
 		if (ray_dir.y < 0)
 		{
 			step_y = -1;
-			side_dist.y = (player->pos_y - map.y) * delta_dist.y;
 		}
 		else
 		{
 			step_y = 1;
-			side_dist.y = (map.y + 1.0 - player->pos_y) * delta_dist.y;
 		}
 
 		/*perform DDA*/
