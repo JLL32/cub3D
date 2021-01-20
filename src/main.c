@@ -254,11 +254,18 @@ t_coordinate get_ray_dir(t_player *player, int win_width, int x)
 }
 
 //which square of the map we're in
-t_square pos_to_map_pos(t_player *player)
+t_square pos_to_map_pos(t_player player)
 {
 
-	return ((t_square){player->pos_x, player->pos_y});
+	return ((t_square){player.pos_x, player.pos_y});
 }
+
+//length of ray from one x or y-side to next x or y-side
+t_coordinate get_delta_dist(t_coordinate ray_dir)
+{
+	return ((t_coordinate){fabs(1.0 / ray_dir.x), fabs(1.0 / ray_dir.y)});
+}
+
 
 int draw(t_game *game)
 {
@@ -280,15 +287,15 @@ int draw(t_game *game)
 		/* int map_x = (int)player->pos_x; */
 		/* int map_y = (int)player->pos_y; */
 		t_square map;
-		map = pos_to_map_pos(player);
+		map = pos_to_map_pos(*player);
 
 		//length of ray from current position to next x or y-side
-		double side_dist_x;
-		double side_dist_y;
+		/* double side_dist_x; */
+		/* double side_dist_y; */
 
 		//length of ray from one x or y-side to next x or y-side
-		double delta_dist_x = fabs(1.0 / ray_dir.x);
-		double delta_dist_y = fabs(1.0 / ray_dir.y);
+		t_coordinate delta_dist;
+		delta_dist = get_delta_dist(ray_dir);
 		double perp_wall_dist;
 
 		//what direction to step in x or y-direction (either +1 or -1)
@@ -299,40 +306,41 @@ int draw(t_game *game)
 		int side;	 //was a NS or a EW wall hit?
 
 		//calculate step and initial side_dist
+		t_coordinate side_dist;
 		if (ray_dir.x < 0)
 		{
 			step_x = -1;
-			side_dist_x = (player->pos_x - map.x) * delta_dist_x;
+			side_dist.x = (player->pos_x - map.x) * delta_dist.x;
 		}
 		else
 		{
 			step_x = 1;
-			side_dist_x = (map.x + 1.0 - player->pos_x) * delta_dist_x;
+			side_dist.x = (map.x + 1.0 - player->pos_x) * delta_dist.x;
 		}
 		if (ray_dir.y < 0)
 		{
 			step_y = -1;
-			side_dist_y = (player->pos_y - map.y) * delta_dist_y;
+			side_dist.y = (player->pos_y - map.y) * delta_dist.y;
 		}
 		else
 		{
 			step_y = 1;
-			side_dist_y = (map.y + 1.0 - player->pos_y) * delta_dist_y;
+			side_dist.y = (map.y + 1.0 - player->pos_y) * delta_dist.y;
 		}
 
 		/*perform DDA*/
 		while (hit == 0)
 		{
 			/*jump to next map square, or in x_direction, or in y-direction*/
-			if (side_dist_x < side_dist_y)
+			if (side_dist.x < side_dist.y)
 			{
-				side_dist_x += delta_dist_x;
+				side_dist.x += delta_dist.x;
 				map.x += step_x;
 				side = 0;
 			}
 			else
 			{
-				side_dist_y += delta_dist_y;
+				side_dist.y += delta_dist.y;
 				map.y += step_y;
 				side = 1;
 			}
