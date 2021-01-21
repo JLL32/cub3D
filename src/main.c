@@ -133,9 +133,51 @@ void sort_sprites(int *order, double *dist, int amount)
 	}
 }
 
-t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_map **string*/)
+// performs DDA
+t_wall_stripe detect_wall(t_player *player, t_resolution res, t_square map, t_coordinate ray_dir, t_coordinate side_dist, t_coordinate delta_dist, t_square step_dir /*, world_map **string*/)
 {
+	int side;	 //was a NS or a EW wall hit?
+	int hit = 0; //was there a wall hit?
+	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
+	double perp_wall_dist;
+	while (hit == 0)
+	{
+		/*jump to next map square, or in x_direction, or in y-direction*/
+		if (side_dist.x < side_dist.y)
+		{
+			side_dist.x += delta_dist.x;
+			map.x += step_dir.x;
+			if (ray_dir.x > 0)
+				side = 0;
+			else
+				side = 2;
+		}
+		else
+		{
+			side_dist.y += delta_dist.y;
+			map.y += step_dir.y;
+			if (ray_dir.y > 0)
+				side = 3;
+			else
+				side = 1;
+		}
+		/*check if ray has hit a wall*/
+		if (world_map[map.x][map.y] > 0)
+			hit = 1;
+	}
+	if (side % 2 == 0)
+		perp_wall_dist = (map.x - player->pos_x + (1.0 - step_dir.x) / 2) / ray_dir.x;
+	else
+		perp_wall_dist = (map.y - player->pos_y + (1.0 - step_dir.y) / 2) / ray_dir.y;
+	double wall_x; // where exactly the wall was hit
+	if (side % 2 == 0)
+		wall_x = player->pos_y + perp_wall_dist * ray_dir.y;
+	else
+		wall_x = player->pos_x + perp_wall_dist * ray_dir.x;
+	wall_x -= floor(wall_x);
 
+	/* calculate line_height */
+	int line_height = (int)(res.height / perp_wall_dist);
 	return ((t_wall_stripe){perp_wall_dist, side, wall_x, line_height});
 }
 
@@ -261,50 +303,52 @@ int draw(t_game *game)
 		// 1: north
 		// 2: east
 		// 3: south
-		int side;	 //was a NS or a EW wall hit?
-		int hit = 0; //was there a wall hit?
-		while (hit == 0)
-		{
-			/*jump to next map square, or in x_direction, or in y-direction*/
-			if (side_dist.x < side_dist.y)
-			{
-				side_dist.x += delta_dist.x;
-				map.x += step_dir.x;
-				if (ray_dir.x > 0)
-					side = 0;
-				else
-					side = 2;
-			}
-			else
-			{
-				side_dist.y += delta_dist.y;
-				map.y += step_dir.y;
-				if (ray_dir.y > 0)
-					side = 3;
-				else
-					side = 1;
-			}
-			/*check if ray has hit a wall*/
-			if (world_map[map.x][map.y] > 0)
-				hit = 1;
-		}
+		/* int side;	 //was a NS or a EW wall hit? */
+		/*int hit = 0; //was there a wall hit?*/
+		/*while (hit == 0)*/
+		/*{*/
+		/*	//jump to next map square, or in x_direction, or in y-direction*/
+		/*	if (side_dist.x < side_dist.y)*/
+		/*	{*/
+		/*		side_dist.x += delta_dist.x;*/
+		/*		map.x += step_dir.x;*/
+		/*		if (ray_dir.x > 0)*/
+		/*			side = 0;*/
+		/*		else*/
+		/*			side = 2;*/
+		/*	}*/
+		/*	else*/
+		/*	{*/
+		/*		side_dist.y += delta_dist.y;*/
+		/*		map.y += step_dir.y;*/
+		/*		if (ray_dir.y > 0)*/
+		/*			side = 3;*/
+		/*		else*/
+		/*			side = 1;*/
+		/*	}*/
+		/*	//check if ray has hit a wall*/
+		/*	if (world_map[map.x][map.y] > 0)*/
+		/*		hit = 1;*/
+		/*}*/
 		/*Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
-		double perp_wall_dist;
-		if (side % 2 == 0)
-			perp_wall_dist = (map.x - player->pos_x + (1.0 - step_dir.x) / 2) / ray_dir.x;
-		else
-			perp_wall_dist = (map.y - player->pos_y + (1.0 - step_dir.y) / 2) / ray_dir.y;
+		t_wall_stripe stripe = detect_wall(player, game->res, map, ray_dir, side_dist, delta_dist, step_dir);
+		double perp_wall_dist = stripe.dist;
+		int side = stripe.side;
+		/* if (side % 2 == 0) */
+		/* 	perp_wall_dist = (map.x - player->pos_x + (1.0 - step_dir.x) / 2) / ray_dir.x; */
+		/* else */
+		/* 	perp_wall_dist = (map.y - player->pos_y + (1.0 - step_dir.y) / 2) / ray_dir.y; */
 
 		// calculate the value of wall_x
-		double wall_x; // where exactly the wall was hit
-		if (side % 2 == 0)
-			wall_x = player->pos_y + perp_wall_dist * ray_dir.y;
-		else
-			wall_x = player->pos_x + perp_wall_dist * ray_dir.x;
-		wall_x -= floor(wall_x);
+		double wall_x = stripe.wall_x; // where exactly the wall was hit
+		/* if (side % 2 == 0) */
+		/* 	wall_x = player->pos_y + perp_wall_dist * ray_dir.y; */
+		/* else */
+		/* 	wall_x = player->pos_x + perp_wall_dist * ray_dir.x; */
+		/* wall_x -= floor(wall_x); */
 
 		/* calculate line_height */
-		int line_height = (int)(screen_height / perp_wall_dist);
+		int line_height = stripe.height; //(int)(screen_height / perp_wall_dist);
 		/*calculate the lowest and highest pixel fo fill in the current stripe*/
 		int draw_start = -line_height / 2 + screen_height / 2;
 		if (draw_start < 0)
@@ -403,7 +447,7 @@ int draw(t_game *game)
 		if (draw_start_y < 0)
 			draw_start_y = 0;
 		int draw_end_y = sprite_height / 2 + screen_height / 2;
-		if (draw_end_y >= screen_height)
+		if (draw_end_y >= screen_height) 
 			draw_end_y = screen_height - 1;
 
 		//calculate width of the sprite

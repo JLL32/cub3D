@@ -109,10 +109,13 @@ typedef struct s_wall_stripe
 {
 	double dist;
 	int side;
-	int wall_x;
+	double wall_x;
 	int height;
 } t_wall_stripe;
 
+/* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
+/* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
+/* 		t_resolution res, t_square step_dir); */
 
 t_player create_player();
 void move_up(t_player *player);
