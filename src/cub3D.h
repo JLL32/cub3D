@@ -113,6 +113,14 @@ typedef struct s_wall_stripe
 	int height;
 } t_wall_stripe;
 
+typedef struct s_ray {
+	t_coordinate dir;
+	t_square map_pos;
+	t_coordinate delta_dist;
+	t_coordinate side_dist;
+	t_square step_dir;
+} t_ray;
+
 /* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
 /* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
 /* 		t_resolution res, t_square step_dir); */
