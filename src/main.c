@@ -140,7 +140,8 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_ma
 	t_ray ray = cast_ray(*player, res.width, x);
 	int side;	 //was a NS or a EW wall hit?
 	int hit = 0; //was there a wall hit?
-	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
+	double wall_x; // where exactly the wall was hit
+
 	double perp_wall_dist;
 	while (hit == 0)
 	{
@@ -167,11 +168,12 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_ma
 		if (world_map[ray.map_pos.x][ray.map_pos.y] > 0)
 			hit = 1;
 	}
+	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
 	if (side % 2 == 0)
 		perp_wall_dist = (ray.map_pos.x - player->pos_x + (1.0 - ray.step_dir.x) / 2) / ray.dir.x;
 	else
 		perp_wall_dist = (ray.map_pos.y - player->pos_y + (1.0 - ray.step_dir.y) / 2) / ray.dir.y;
-	double wall_x; // where exactly the wall was hit
+
 	if (side % 2 == 0)
 		wall_x = player->pos_y + perp_wall_dist * ray.dir.y;
 	else
@@ -268,6 +270,19 @@ t_ray cast_ray(t_player player, int win_width, int x)
 	return (ray);
 }
 
+/*calculate the lowest and highest pixel fo fill in the current stripe*/
+t_interval get_drawing_interval(int win_height, int stripe_height)
+{
+	t_interval interval;
+	interval.start = -stripe_height / 2 + win_height / 2;
+	if (interval.start < 0)
+		interval.start = 0;
+	interval.end = stripe_height / 2 + win_height / 2;
+	if (interval.end >= win_height)
+		interval.end = win_height - 1;
+	return  (interval);
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -281,35 +296,28 @@ int draw(t_game *game)
 	{
 		t_wall_stripe stripe = detect_wall(player, game->res, x);
 
-		/*calculate the lowest and highest pixel fo fill in the current stripe*/
-		int draw_start = -stripe.height / 2 + screen_height / 2;
-		if (draw_start < 0)
-			draw_start = 0;
-		int draw_end = stripe.height / 2 + screen_height / 2;
-		if (draw_end >= screen_height)
-			draw_end = screen_height - 1;
-
+		t_interval draw = get_drawing_interval(game->res.height, stripe.height);
 		// side % 2 != 0
 		// side % 2 == 0
 		// x coordinate on the texture
 		int tex_x = (int)(stripe.wall_x * (double)(tex_width));
-		if (stripe.side == 0)
+		if (stripe.side % 2 == 0)
 			tex_x = tex_width - tex_x - 1;
-		if (stripe.side == 1)
+		if (stripe.side % 2 != 0)
 			tex_x = tex_width - tex_x - 1;
 
 		// How much to increase the texture coordinate per screen pixel
 		double steps = 1.0 * tex_height / stripe.height;
 		// Starting texture coordinat
-		double tex_pos = (draw_start - screen_height / 2.0 + stripe.height / 2.0) * steps;
+		double tex_pos = (draw.start - screen_height / 2.0 + stripe.height / 2.0) * steps;
 
 		int y = 0;
-		while (y < draw_start)
+		while (y < draw.start)
 		{
 			my_mlx_pixel_put(game, x, y, game->colors.ceiling);
 			y++;
 		}
-		while (y < draw_end)
+		while (y < draw.end)
 		{
 			// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
 			int text_y = (int)tex_pos & (tex_height - 1);
