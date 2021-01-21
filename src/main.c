@@ -43,6 +43,7 @@ double sprite_distance[num_sprites];
 void sort_sprites(int *order, double *dist, int amount);
 
 int draw(t_game *game);
+t_ray cast_ray(t_player player, int win_width, int x);
 void my_mlx_pixel_put(t_game *game, int x, int y, int color)
 {
 	t_data *buffer = &game->win_buffer;
@@ -134,8 +135,9 @@ void sort_sprites(int *order, double *dist, int amount)
 }
 
 // performs DDA
-t_wall_stripe detect_wall(t_player *player, t_resolution res, t_ray ray /*, world_map **string*/)
+t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_map **string*/)
 {
+	t_ray ray = cast_ray(*player, res.width, x);
 	int side;	 //was a NS or a EW wall hit?
 	int hit = 0; //was there a wall hit?
 	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
@@ -277,57 +279,29 @@ int draw(t_game *game)
 
 	for (int x = 0; x < screen_width; x++)
 	{
-		/* t_coordinate ray_dir; */
-		/* ray_dir = get_ray_dir(player, game->res.width, x); */
+		t_wall_stripe stripe = detect_wall(player, game->res, x);
 
-		/* t_square map; */
-		/* map = pos_to_map_pos(*player); */
-
-		/* //length of ray from one x or y-side to next x or y-side */
-		/* t_coordinate delta_dist; */
-		/* delta_dist = get_delta_dist(ray_dir); */
-
-		/* //calculate step and initial side_dist */
-		/* //length of ray from current position to next x or y-side */
-		/* t_coordinate side_dist; */
-		/* side_dist = get_side_dist(delta_dist, ray_dir, map, *player); */
-
-		/* //what direction to step in x or y-direction (either +1 or -1) */
-		/* t_square step_dir; */
-		/* step_dir = get_step_dir(ray_dir); */
-		t_ray ray = cast_ray(game->player, game->res.width, x);
-		t_wall_stripe stripe = detect_wall(player, game->res, ray);
-		double perp_wall_dist = stripe.dist;
-		int side = stripe.side;
-
-		// calculate the value of wall_x
-		double wall_x = stripe.wall_x; // where exactly the wall was hit
-
-		/* calculate line_height */
-		int line_height = stripe.height; //(int)(screen_height / perp_wall_dist);
 		/*calculate the lowest and highest pixel fo fill in the current stripe*/
-		int draw_start = -line_height / 2 + screen_height / 2;
+		int draw_start = -stripe.height / 2 + screen_height / 2;
 		if (draw_start < 0)
 			draw_start = 0;
-		int draw_end = line_height / 2 + screen_height / 2;
+		int draw_end = stripe.height / 2 + screen_height / 2;
 		if (draw_end >= screen_height)
 			draw_end = screen_height - 1;
 
 		// side % 2 != 0
 		// side % 2 == 0
 		// x coordinate on the texture
-		int tex_x = (int)(wall_x * (double)(tex_width));
-		if (side == 0)
+		int tex_x = (int)(stripe.wall_x * (double)(tex_width));
+		if (stripe.side == 0)
 			tex_x = tex_width - tex_x - 1;
-		if (side == 1)
+		if (stripe.side == 1)
 			tex_x = tex_width - tex_x - 1;
 
 		// How much to increase the texture coordinate per screen pixel
-		double steps = 1.0 * tex_height / line_height;
+		double steps = 1.0 * tex_height / stripe.height;
 		// Starting texture coordinat
-		double tex_pos = (draw_start - screen_height / 2.0 + line_height / 2.0) * steps;
-
-		int tex_num = side;
+		double tex_pos = (draw_start - screen_height / 2.0 + stripe.height / 2.0) * steps;
 
 		int y = 0;
 		while (y < draw_start)
@@ -340,9 +314,9 @@ int draw(t_game *game)
 			// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
 			int text_y = (int)tex_pos & (tex_height - 1);
 			tex_pos += steps;
-			int color = textures[tex_num].addr[tex_height * text_y + tex_x];
+			int color = textures[stripe.side].addr[tex_height * text_y + tex_x];
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
-			if (side % 2 != 1)
+			if (stripe.side % 2 != 1)
 				color = (color >> 1) & 8355711;
 			my_mlx_pixel_put(game, x, y, color);
 			y++;
@@ -353,7 +327,7 @@ int draw(t_game *game)
 			y++;
 		}
 
-		z_buffer[x] = perp_wall_dist;
+		z_buffer[x] = stripe.dist;
 	}
 
 	// sprite casting
