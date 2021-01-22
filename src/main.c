@@ -310,6 +310,43 @@ void draw_vertical_line(t_game *game, int x, int start, int end, int color)
 		y++;
 	}
 }
+void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
+{
+	int y = draw.start;
+	while (y < draw.end)
+	{
+		// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
+		tex.y = (int)tex.pos & (tex_height - 1);
+		tex.pos += tex.step;
+		int color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
+		// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
+		if (stripe.side % 2 != 1)
+			color = (color >> 1) & 8355711;
+		my_mlx_pixel_put(game, x, y, color);
+		y++;
+	}
+}
+
+void draw_walls(t_game *game, double z_buffer[])
+{
+	t_wall_stripe stripe;
+	t_interval draw;
+	t_tex_stripe tex;
+	int x;
+	
+	x = 0;
+	while (x < game->res.width)
+	{
+		stripe = detect_wall(&game->player, game->res, x);
+		draw = get_drawing_interval(game->res.height, stripe.height);
+		tex = get_tex_stripe(stripe, game->res.height, draw);
+		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
+		draw_tex_stripe(game, stripe, tex, x, draw);
+		draw_vertical_line(game, x, draw.end, game->res.height, game->colors.floor);
+		z_buffer[x] = stripe.dist;
+		x++;
+	}
+}
 
 int draw(t_game *game)
 {
@@ -318,30 +355,9 @@ int draw(t_game *game)
 	int screen_width = game->res.width;
 
 	// 1D ZBuffer
-	double z_buffer[screen_width];
+	double z_buffer[game->res.width];
 
-	for (int x = 0; x < screen_width; x++)
-	{
-		t_wall_stripe stripe = detect_wall(player, game->res, x);
-		t_interval draw = get_drawing_interval(game->res.height, stripe.height);
-		t_tex_stripe tex = get_tex_stripe(stripe, game->res.height, draw);
-		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
-		int y = draw.start;
-		while (y < draw.end)
-		{
-			// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
-			tex.y = (int)tex.pos & (tex_height - 1);
-			tex.pos += tex.step;
-			int color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
-			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
-			if (stripe.side % 2 != 1)
-				color = (color >> 1) & 8355711;
-			my_mlx_pixel_put(game, x, y, color);
-			y++;
-		}
-		draw_vertical_line(game, x, draw.end, screen_height, game->colors.floor);
-		z_buffer[x] = stripe.dist;
-	}
+	draw_walls(game, z_buffer);
 
 	// sprite casting
 	// sorts sprites from for to close
