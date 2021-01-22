@@ -283,6 +283,34 @@ t_interval get_drawing_interval(int win_height, int stripe_height)
 	return  (interval);
 }
 
+t_tex_stripe get_tex_stripe(t_wall_stripe stripe, int height, t_interval draw)
+{
+	// x coordinate on the texture
+	int tex_x;
+	// How much to increase the texture coordinate per screen pixel
+	double step;
+	// Starting texture coordinat
+	double pos;
+	tex_x = (int)(stripe.wall_x * (double)(tex_width));
+	if (stripe.side % 2 == 0)
+		tex_x = tex_width - tex_x - 1;
+	if (stripe.side % 2 != 0)
+		tex_x = tex_width - tex_x - 1;
+
+	step = 1.0 * tex_height / stripe.height;
+	pos = (draw.start - height / 2.0 + stripe.height / 2.0) * step;
+	return ((t_tex_stripe){tex_x, 0, pos, step});
+}
+void draw_vertical_line(t_game *game, int x, int start, int end, int color)
+{
+	int y = start;
+	while (y < end)
+	{
+		my_mlx_pixel_put(game, x, y, color);
+		y++;
+	}
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -295,46 +323,23 @@ int draw(t_game *game)
 	for (int x = 0; x < screen_width; x++)
 	{
 		t_wall_stripe stripe = detect_wall(player, game->res, x);
-
 		t_interval draw = get_drawing_interval(game->res.height, stripe.height);
-		// side % 2 != 0
-		// side % 2 == 0
-		// x coordinate on the texture
-		int tex_x = (int)(stripe.wall_x * (double)(tex_width));
-		if (stripe.side % 2 == 0)
-			tex_x = tex_width - tex_x - 1;
-		if (stripe.side % 2 != 0)
-			tex_x = tex_width - tex_x - 1;
-
-		// How much to increase the texture coordinate per screen pixel
-		double steps = 1.0 * tex_height / stripe.height;
-		// Starting texture coordinat
-		double tex_pos = (draw.start - screen_height / 2.0 + stripe.height / 2.0) * steps;
-
-		int y = 0;
-		while (y < draw.start)
-		{
-			my_mlx_pixel_put(game, x, y, game->colors.ceiling);
-			y++;
-		}
+		t_tex_stripe tex = get_tex_stripe(stripe, game->res.height, draw);
+		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
+		int y = draw.start;
 		while (y < draw.end)
 		{
 			// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
-			int text_y = (int)tex_pos & (tex_height - 1);
-			tex_pos += steps;
-			int color = textures[stripe.side].addr[tex_height * text_y + tex_x];
+			tex.y = (int)tex.pos & (tex_height - 1);
+			tex.pos += tex.step;
+			int color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
 			// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
 			if (stripe.side % 2 != 1)
 				color = (color >> 1) & 8355711;
 			my_mlx_pixel_put(game, x, y, color);
 			y++;
 		}
-		while (y < screen_height)
-		{
-			my_mlx_pixel_put(game, x, y, game->colors.floor);
-			y++;
-		}
-
+		draw_vertical_line(game, x, draw.end, screen_height, game->colors.floor);
 		z_buffer[x] = stripe.dist;
 	}
 

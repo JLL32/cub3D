@@ -126,6 +126,13 @@ typedef struct s_interval {
 	int end;
 } t_interval;
 
+typedef struct s_tex_stripe {
+	int x;
+	int y;
+	double pos;
+	double step;
+} t_tex_stripe;
+
 /* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
 /* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
 /* 		t_resolution res, t_square step_dir); */
