@@ -466,13 +466,9 @@ int draw(t_game *game)
 	t_player *player = &game->player;
 	int screen_height = game->res.height;
 	int screen_width = game->res.width;
-
-	// 1D ZBuffer
 	double z_buffer[game->res.width];
-
+	
 	draw_walls(game, z_buffer);
-
-	// sprite casting
 	pupilate_order(sprite_order, num_sprites);
 	pupilate_distance(game->player, sprite, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
@@ -482,24 +478,15 @@ int draw(t_game *game)
 	{
 		t_coordinate transform = get_transform(game->player, sprite, sprite_order, i);
 		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
-
 		int sprite_height = abs((int)(screen_height / transform.y));
 		int sprite_width = abs((int)(screen_height / transform.y));
-
 		t_square draw_start = get_sprite_draw_start(sprite_height, sprite_width, game->res, sprite_screen_x);
 		t_square draw_end = get_sprite_draw_end(sprite_height, sprite_width, game->res, sprite_screen_x);
 
-		//loop through every vertical stripe of the sprite on screen
 		draw_sprite(game, game->res, draw_start, draw_end, transform, sprite_width, sprite_height, sprite_screen_x, z_buffer);
 	}
 
-	//Updates the screen.  Has to be called to view new pixels, but use only after
-	//drawing the whole screen because it's slow.
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
-	// speed modifiers
-	player->move_speed = 0.2;
-	player->rot_speed = 0.06;
-
 	return 0;
 }
 

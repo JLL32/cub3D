@@ -27,7 +27,7 @@ t_player create_player()
 	player.pos_y = 11.5;
 	player.dir_x = -1.0;
 	player.dir_y = 0.0;
-	player.move_speed = 0.1;
+	player.move_speed = 0.2;
 	player.rot_speed = 0.06;
 	player.plane_x = 0;
 	player.plane_y = .66;
