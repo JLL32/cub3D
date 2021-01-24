@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
-#include <sys/_types/_size_t.h>
 
 /* # define screen_width 1200 */
 /* # define screen_height 600 */

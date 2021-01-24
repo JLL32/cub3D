@@ -117,6 +117,7 @@ void pair_sort(t_pair arr[], int n)
 				swap(&arr[j], &arr[j + 1]);
 }
 
+// sorts sprites from for to close
 void sort_sprites(int *order, double *dist, int amount)
 {
 	/* std::vector<std::pair<double, int>> sprites(amount); */
@@ -425,6 +426,41 @@ t_square get_sprite_draw_end(int sprite_height, int sprite_width, t_resolution r
 	return (draw_end);
 }
 
+//loops through every vertical stripe of the sprite on screen and draws it
+//the conditions in the if are:
+//1) it's in front of camera plane so you don't see things behind you
+//2) it's on the screen (left)
+//3) it's on the screen (right)
+//4) ZBuffer, with perpendicular distance
+void draw_sprite(t_game *game, t_resolution res, t_square draw_start, t_square draw_end, t_coordinate transform, int sprite_width, int sprite_height, int sprite_screen_x, double z_buffer[])
+{
+	t_square tex_px;
+	int d;
+	int color;
+	int stripe;
+	int y;
+
+	stripe = draw_start.x;
+	while (stripe < draw_end.x)
+	{
+		tex_px.x = (int)(256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * tex_width / sprite_width) / 256;
+		if (transform.y > 0 && stripe > 0 && stripe < res.width && transform.y < z_buffer[stripe])
+		{
+			y = draw_start.y;
+			while (y < draw_end.y) //for every pixel of the current stripe
+			{
+				d = (y)*256 - res.height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
+				tex_px.y = ((d * tex_height) / sprite_height) / 256;
+				color = textures[SPR_TEX_INDX].addr[tex_width * tex_px.y + tex_px.x]; //get current color from the texture
+				if ((color & 0x00FFFFFF) != 0)
+					my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+				y++;
+			}
+		}
+		stripe++;
+	}
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -437,7 +473,6 @@ int draw(t_game *game)
 	draw_walls(game, z_buffer);
 
 	// sprite casting
-	// sorts sprites from for to close
 	pupilate_order(sprite_order, num_sprites);
 	pupilate_distance(game->player, sprite, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
@@ -451,29 +486,11 @@ int draw(t_game *game)
 		int sprite_height = abs((int)(screen_height / transform.y));
 		int sprite_width = abs((int)(screen_height / transform.y));
 
-		// calculate the lowest and highest pixels to fill in current stripe
 		t_square draw_start = get_sprite_draw_start(sprite_height, sprite_width, game->res, sprite_screen_x);
 		t_square draw_end = get_sprite_draw_end(sprite_height, sprite_width, game->res, sprite_screen_x);
 
 		//loop through every vertical stripe of the sprite on screen
-		for (int stripe = draw_start.x; stripe < draw_end.x; stripe++)
-		{
-			int tex_x = (int)(256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * tex_width / sprite_width) / 256;
-			//the conditions in the if are:
-			//1) it's in front of camera plane so you don't see things behind you
-			//2) it's on the screen (left)
-			//3) it's on the screen (right)
-			//4) ZBuffer, with perpendicular distance
-			if (transform.y > 0 && stripe > 0 && stripe < screen_width && transform.y < z_buffer[stripe])
-				for (int y = draw_start.y; y < draw_end.y; y++) //for every pixel of the current stripe
-				{
-					int d = (y)*256 - screen_height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
-					int tex_y = ((d * tex_height) / sprite_height) / 256;
-					int color = textures[SPR_TEX_INDX].addr[tex_width * tex_y + tex_x]; //get current color from the texture
-					if ((color & 0x00FFFFFF) != 0)
-						my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
-				}
-		}
+		draw_sprite(game, game->res, draw_start, draw_end, transform, sprite_width, sprite_height, sprite_screen_x, z_buffer);
 	}
 
 	//Updates the screen.  Has to be called to view new pixels, but use only after
