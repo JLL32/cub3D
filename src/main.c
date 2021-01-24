@@ -372,6 +372,31 @@ void pupilate_distance(t_player player, t_sprite sprites[], int num)
 		i++;
 	}
 }
+
+t_coordinate get_transform(t_player player, t_sprite sprites[], int sprite_order[], int i)
+{
+
+	double sprite_x;
+	double sprite_y;
+	double inv_det;
+	t_coordinate transform;
+
+	// translate sprite position to relative to camera
+	sprite_x = sprite[sprite_order[i]].x - player.pos_x;
+	sprite_y = sprite[sprite_order[i]].y - player.pos_y;
+
+	//transform sprite with the inverse camera matrix
+	// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+	// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+	// [ planeY   dirY ]                                          [ -planeY  planeX ]
+	inv_det = 1.0 / (player.plane_x * player.dir_y - player.dir_x * player.plane_y); // required for correct matrix multiplication
+
+	transform.x = inv_det * (player.dir_y * sprite_x - player.dir_x * sprite_y);
+	transform.y = inv_det * (-player.plane_y * sprite_x + player.plane_x * sprite_y);
+
+	return (transform);
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -392,34 +417,22 @@ int draw(t_game *game)
 	// after sorting the sprites do the projection and draw them
 	for (int i = 0; i < num_sprites; i++)
 	{
-		// translate sprite position to relative to camera
-		double sprite_x = sprite[sprite_order[i]].x - player->pos_x;
-		double sprite_y = sprite[sprite_order[i]].y - player->pos_y;
-
-		//transform sprite with the inverse camera matrix
-		// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-		// [ planeY   dirY ]                                          [ -planeY  planeX ]
-		double inv_det = 1.0 / (player->plane_x * player->dir_y - player->dir_x * player->plane_y); // required for correct matrix multiplication
-
-		double transform_x = inv_det * (player->dir_y * sprite_x - player->dir_x * sprite_y);
-		double transform_y = inv_det * (-player->plane_y * sprite_x + player->plane_x * sprite_y);
-
-		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform_x / transform_y));
+		t_coordinate transform = get_transform(game->player, sprite, sprite_order, i);
 
 		// calculate the height of the sprite on screen
-		int sprite_height = abs((int)(screen_height / transform_y));
+		int sprite_height = abs((int)(screen_height / transform.y));
 
 		// calculate the lowest and highest pixels to fill in current stripe
 		int draw_start_y = -sprite_height / 2 + screen_height / 2;
 		if (draw_start_y < 0)
 			draw_start_y = 0;
 		int draw_end_y = sprite_height / 2 + screen_height / 2;
-		if (draw_end_y >= screen_height) 
+		if (draw_end_y >= screen_height)
 			draw_end_y = screen_height - 1;
 
+		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
 		//calculate width of the sprite
-		int sprite_width = abs((int)(screen_height / transform_y));
+		int sprite_width = abs((int)(screen_height / transform.y));
 		int draw_start_x = -sprite_width / 2 + sprite_screen_x;
 		if (draw_start_x < 0)
 			draw_start_x = 0;
@@ -436,7 +449,7 @@ int draw(t_game *game)
 			//2) it's on the screen (left)
 			//3) it's on the screen (right)
 			//4) ZBuffer, with perpendicular distance
-			if (transform_y > 0 && stripe > 0 && stripe < screen_width && transform_y < z_buffer[stripe])
+			if (transform.y > 0 && stripe > 0 && stripe < screen_width && transform.y < z_buffer[stripe])
 				for (int y = draw_start_y; y < draw_end_y; y++) //for every pixel of the current stripe
 				{
 					int d = (y)*256 - screen_height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
