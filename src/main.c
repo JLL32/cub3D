@@ -3,6 +3,8 @@
 
 #define GRAY 0x5A5A5A
 #define SKY_BLUE 0xADD8E6
+#define num_sprites 8
+#define SPR_TEX_INDX 4
 
 typedef struct s_texture
 {
@@ -17,22 +19,21 @@ typedef struct s_sprite
 {
 	double x;
 	double y;
-	int texture;
 } t_sprite;
 
-#define num_sprites 8
+
 
 t_sprite sprite[num_sprites] =
 {
 	//some pillars around the map
-	{21.5, 1.5, 4},
-	{15.5, 1.5, 4},
-	{16.0, 1.8, 4},
-	{16.2, 1.2, 4},
-	{3.5, 2.5, 4},
-	{9.5, 15.5, 4},
-	{10.0, 15.1, 4},
-	{10.5, 15.8, 4},
+	{21.5, 1.5},
+	{15.5, 1.5},
+	{16.0, 1.8},
+	{16.2, 1.2},
+	{3.5, 2.5},
+	{9.5, 15.5},
+	{10.0, 15.1},
+	{10.5, 15.8},
 };
 
 // arrays used to sort the sprites
@@ -348,6 +349,29 @@ void draw_walls(t_game *game, double z_buffer[])
 	}
 }
 
+void pupilate_order(int sprite_order[], int num)
+{
+	int i;
+	
+	i = 0;
+	while (i < num)
+	{
+		sprite_order[i] = i;
+		i++;
+	}
+}
+
+void pupilate_distance(t_player player, t_sprite sprites[], int num)
+{
+	int i;
+	
+	i = 0;
+	while (i < num_sprites)
+	{
+		sprite_distance[i] = ((player.pos_x - sprites[i].x) * (player.pos_x - sprite[i].x) + (player.pos_y - sprites[i].y) * (player.pos_y - sprites[i].y));
+		i++;
+	}
+}
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -361,11 +385,8 @@ int draw(t_game *game)
 
 	// sprite casting
 	// sorts sprites from for to close
-	for (int i = 0; i < num_sprites; i++)
-	{
-		sprite_order[i] = i;
-		sprite_distance[i] = ((player->pos_x - sprite[i].x) * (player->pos_x - sprite[i].x) + (player->pos_y - sprite[i].y) * (player->pos_y - sprite[i].y));
-	}
+	pupilate_order(sprite_order, num_sprites);
+	pupilate_distance(game->player, sprite, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
 
 	// after sorting the sprites do the projection and draw them
@@ -420,7 +441,7 @@ int draw(t_game *game)
 				{
 					int d = (y)*256 - screen_height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
 					int tex_y = ((d * tex_height) / sprite_height) / 256;
-					int color = textures[sprite[sprite_order[i]].texture].addr[tex_width * tex_y + tex_x]; //get current color from the texture
+					int color = textures[SPR_TEX_INDX].addr[tex_width * tex_y + tex_x]; //get current color from the texture
 					if ((color & 0x00FFFFFF) != 0)
 						my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
 				}
