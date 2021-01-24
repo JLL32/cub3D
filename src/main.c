@@ -397,6 +397,34 @@ t_coordinate get_transform(t_player player, t_sprite sprites[], int sprite_order
 	return (transform);
 }
 
+// calculates the lowest pixels to fill of a sprite's stripe
+t_square get_sprite_draw_start(int sprite_height, int sprite_width, t_resolution res, int sprite_screen_x)
+{
+	t_square draw_start;
+
+	draw_start.x = -sprite_width / 2 + sprite_screen_x;
+	if (draw_start.x < 0)
+		draw_start.x = 0;
+	draw_start.y = -sprite_height / 2 + res.height / 2;
+	if (draw_start.y < 0)
+		draw_start.y = 0;
+	return (draw_start);
+}
+
+// calculates the highest pixels to fill of a sprite's stripe
+t_square get_sprite_draw_end(int sprite_height, int sprite_width, t_resolution res, int sprite_screen_x)
+{
+	t_square draw_end;
+
+	draw_end.y = sprite_height / 2 + res.height / 2;
+	if (draw_end.y >= res.height)
+		draw_end.y = res.height - 1;
+	draw_end.x = sprite_width / 2 + sprite_screen_x;
+	if (draw_end.x >= res.width)
+		draw_end.x = res.width - 1;
+	return (draw_end);
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -418,30 +446,17 @@ int draw(t_game *game)
 	for (int i = 0; i < num_sprites; i++)
 	{
 		t_coordinate transform = get_transform(game->player, sprite, sprite_order, i);
+		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
 
-		// calculate the height of the sprite on screen
 		int sprite_height = abs((int)(screen_height / transform.y));
+		int sprite_width = abs((int)(screen_height / transform.y));
 
 		// calculate the lowest and highest pixels to fill in current stripe
-		int draw_start_y = -sprite_height / 2 + screen_height / 2;
-		if (draw_start_y < 0)
-			draw_start_y = 0;
-		int draw_end_y = sprite_height / 2 + screen_height / 2;
-		if (draw_end_y >= screen_height)
-			draw_end_y = screen_height - 1;
-
-		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
-		//calculate width of the sprite
-		int sprite_width = abs((int)(screen_height / transform.y));
-		int draw_start_x = -sprite_width / 2 + sprite_screen_x;
-		if (draw_start_x < 0)
-			draw_start_x = 0;
-		int draw_end_x = sprite_width / 2 + sprite_screen_x;
-		if (draw_end_x >= screen_width)
-			draw_end_x = screen_width - 1;
+		t_square draw_start = get_sprite_draw_start(sprite_height, sprite_width, game->res, sprite_screen_x);
+		t_square draw_end = get_sprite_draw_end(sprite_height, sprite_width, game->res, sprite_screen_x);
 
 		//loop through every vertical stripe of the sprite on screen
-		for (int stripe = draw_start_x; stripe < draw_end_x; stripe++)
+		for (int stripe = draw_start.x; stripe < draw_end.x; stripe++)
 		{
 			int tex_x = (int)(256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * tex_width / sprite_width) / 256;
 			//the conditions in the if are:
@@ -450,7 +465,7 @@ int draw(t_game *game)
 			//3) it's on the screen (right)
 			//4) ZBuffer, with perpendicular distance
 			if (transform.y > 0 && stripe > 0 && stripe < screen_width && transform.y < z_buffer[stripe])
-				for (int y = draw_start_y; y < draw_end_y; y++) //for every pixel of the current stripe
+				for (int y = draw_start.y; y < draw_end.y; y++) //for every pixel of the current stripe
 				{
 					int d = (y)*256 - screen_height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
 					int tex_y = ((d * tex_height) / sprite_height) / 256;
