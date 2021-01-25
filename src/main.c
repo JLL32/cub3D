@@ -19,6 +19,7 @@ typedef struct s_sprite
 {
 	double x;
 	double y;
+	t_coordinate trans;
 } t_sprite;
 
 
@@ -476,14 +477,14 @@ int draw(t_game *game)
 	// after sorting the sprites do the projection and draw them
 	for (int i = 0; i < num_sprites; i++)
 	{
-		t_coordinate transform = get_transform(game->player, sprites, sprite_order, i);
-		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
-		int sprite_height = abs((int)(screen_height / transform.y));
-		int sprite_width = abs((int)(screen_height / transform.y));
+		sprites[i].trans = get_transform(game->player, sprites, sprite_order, i);
+		int sprite_screen_x = (int)((screen_width / 2) * (1 + sprites[i].trans.x / sprites[i].trans.y));
+		int sprite_height = abs((int)(screen_height / sprites[i].trans.y));
+		int sprite_width = abs((int)(screen_height / sprites[i].trans.y));
 		t_square draw_start = get_sprite_draw_start(sprite_height, sprite_width, game->res, sprite_screen_x);
 		t_square draw_end = get_sprite_draw_end(sprite_height, sprite_width, game->res, sprite_screen_x);
 
-		draw_sprite(game, game->res, draw_start, draw_end, transform, sprite_width, sprite_height, sprite_screen_x, z_buffer);
+		draw_sprite(game, game->res, draw_start, draw_end, sprites[i].trans, sprite_width, sprite_height, sprite_screen_x, z_buffer);
 	}
 
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
