@@ -437,7 +437,7 @@ t_square get_sprite_draw_end(t_sprite sprite, t_resolution res)
 //2) it's on the screen (left)
 //3) it's on the screen (right)
 //4) ZBuffer, with perpendicular distance
-void draw_sprite(t_game *game, t_resolution res, t_square draw_start, t_square draw_end, t_coordinate transform, int sprite_width, int sprite_height, int sprite_screen_x, double z_buffer[])
+void draw_sprite(t_game *game, t_sprite sprite, double z_buffer[])
 {
 	t_square tex_px;
 	int d;
@@ -445,17 +445,17 @@ void draw_sprite(t_game *game, t_resolution res, t_square draw_start, t_square d
 	int stripe;
 	int y;
 
-	stripe = draw_start.x;
-	while (stripe < draw_end.x)
+	stripe = sprite.draw_start.x;
+	while (stripe < sprite.draw_end.x)
 	{
-		tex_px.x = (int)(256 * (stripe - (-sprite_width / 2 + sprite_screen_x)) * tex_width / sprite_width) / 256;
-		if (transform.y > 0 && stripe > 0 && stripe < res.width && transform.y < z_buffer[stripe])
+		tex_px.x = (int)(256 * (stripe - (-sprite.res.width / 2 + sprite.screen_x)) * tex_width / sprite.res.width) / 256;
+		if (sprite.trans.y > 0 && stripe > 0 && stripe < game->res.width && sprite.trans.y < z_buffer[stripe])
 		{
-			y = draw_start.y;
-			while (y < draw_end.y) //for every pixel of the current stripe
+			y = sprite.draw_start.y;
+			while (y < sprite.draw_end.y) //for every pixel of the current stripe
 			{
-				d = (y)*256 - res.height * 128 + sprite_height * 128; //256 and 128 factors to avoid floats
-				tex_px.y = ((d * tex_height) / sprite_height) / 256;
+				d = (y)*256 - game->res.height * 128 + sprite.res.height * 128; //256 and 128 factors to avoid floats
+				tex_px.y = ((d * tex_height) / sprite.res.height) / 256;
 				color = textures[SPR_TEX_INDX].addr[tex_width * tex_px.y + tex_px.x]; //get current color from the texture
 				if ((color & 0x00FFFFFF) != 0)
 					my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
@@ -488,7 +488,7 @@ int draw(t_game *game)
 		sprites[i].draw_start = get_sprite_draw_start(sprites[i], game->res);
 		sprites[i].draw_end = get_sprite_draw_end(sprites[i], game->res);
 
-		draw_sprite(game, game->res, sprites[i].draw_start, sprites[i].draw_end, sprites[i].trans, sprites[i].res.width, sprites[i].res.height, sprites[i].screen_x, z_buffer);
+		draw_sprite(game, sprites[i], z_buffer);
 	}
 
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
