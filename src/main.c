@@ -41,9 +41,6 @@ t_coordinate sprite_positions[num_sprites] =
 	{10.5, 15.8},
 };
 
-// arrays used to sort the sprites
-int sprite_order[num_sprites];
-double sprite_distance[num_sprites];
 
 // function used to sort the sprites
 void sort_sprites(int *order, double *dist, int amount);
@@ -367,7 +364,7 @@ void populate_order(int sprite_order[], int num)
 	}
 }
 
-void populate_distance(t_player player, t_coordinate sprites[], int num)
+void populate_distance(t_player player, double sprite_distance[], t_coordinate sprites[], int num)
 {
 	int i;
 	
@@ -431,6 +428,20 @@ t_square get_sprite_draw_end(t_sprite sprite, t_resolution res)
 	return (draw_end);
 }
 
+t_sprite get_sprite(t_game *game, int sprite_order[], int i)
+{
+	t_sprite sprite;
+	sprite.x = sprite_positions[i].x;
+	sprite.y = sprite_positions[i].y;
+	sprite.trans = get_transform(game->player, sprite_positions, sprite_order, i);
+	sprite.screen_x = (int)((game->res.width / 2) * (1 + sprite.trans.x / sprite.trans.y));
+	sprite.res.height = abs((int)(game->res.height / sprite.trans.y));
+	sprite.res.width = abs((int)(game->res.height / sprite.trans.y));
+	sprite.draw_start = get_sprite_draw_start(sprite, game->res);
+	sprite.draw_end = get_sprite_draw_end(sprite, game->res);
+	return (sprite);
+}
+
 //loops through every vertical stripe of the sprite on screen and draws it
 //the conditions in the if are:
 //1) it's in front of camera plane so you don't see things behind you
@@ -474,23 +485,20 @@ int draw(t_game *game)
 	double z_buffer[game->res.width];
 	
 	draw_walls(game, z_buffer);
+
+	// arrays used to sort the sprites
+	t_sprite sprite;
+	int sprite_order[num_sprites];
+	double sprite_distance[num_sprites];
+
 	populate_order(sprite_order, num_sprites);
-	populate_distance(game->player, sprite_positions, num_sprites);
+	populate_distance(game->player, sprite_distance, sprite_positions, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
 
 	// after sorting the sprites do the projection and draw them
 	for (int i = 0; i < num_sprites; i++)
 	{
-		t_sprite sprite;
-		sprite.x = sprite_positions[i].x;
-		sprite.y = sprite_positions[i].y;
-		sprite.trans = get_transform(game->player, sprite_positions, sprite_order, i);
-		sprite.screen_x = (int)((screen_width / 2) * (1 + sprite.trans.x / sprite.trans.y));
-		sprite.res.height = abs((int)(screen_height / sprite.trans.y));
-		sprite.res.width = abs((int)(screen_height / sprite.trans.y));
-		sprite.draw_start = get_sprite_draw_start(sprite, game->res);
-		sprite.draw_end = get_sprite_draw_end(sprite, game->res);
-
+		sprite = get_sprite(game, sprite_order, i);
 		draw_sprite(game, sprite, z_buffer);
 	}
 
