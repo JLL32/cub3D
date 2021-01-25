@@ -23,6 +23,7 @@ typedef struct s_sprite
 	int screen_x;
 	t_resolution res;
 	t_square draw_start;
+	t_square draw_end;
 } t_sprite;
 
 
@@ -485,9 +486,9 @@ int draw(t_game *game)
 		sprites[i].res.height = abs((int)(screen_height / sprites[i].trans.y));
 		sprites[i].res.width = abs((int)(screen_height / sprites[i].trans.y));
 		sprites[i].draw_start = get_sprite_draw_start(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
-		t_square draw_end = get_sprite_draw_end(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
+		sprites[i].draw_end = get_sprite_draw_end(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
 
-		draw_sprite(game, game->res, sprites[i].draw_start, draw_end, sprites[i].trans, sprites[i].res.width, sprites[i].res.height, sprites[i].screen_x, z_buffer);
+		draw_sprite(game, game->res, sprites[i].draw_start, sprites[i].draw_end, sprites[i].trans, sprites[i].res.width, sprites[i].res.height, sprites[i].screen_x, z_buffer);
 	}
 
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
