@@ -28,7 +28,7 @@ typedef struct s_sprite
 
 
 
-t_sprite sprites[num_sprites] =
+t_coordinate sprite_positions[num_sprites] =
 {
 	//some pillars around the map
 	{21.5, 1.5},
@@ -367,19 +367,19 @@ void populate_order(int sprite_order[], int num)
 	}
 }
 
-void populate_distance(t_player player, t_sprite sprites[], int num)
+void populate_distance(t_player player, t_coordinate sprites[], int num)
 {
 	int i;
 	
 	i = 0;
-	while (i < num_sprites)
+	while (i < num)
 	{
 		sprite_distance[i] = ((player.pos_x - sprites[i].x) * (player.pos_x - sprites[i].x) + (player.pos_y - sprites[i].y) * (player.pos_y - sprites[i].y));
 		i++;
 	}
 }
 
-t_coordinate get_transform(t_player player, t_sprite sprites[], int sprite_order[], int i)
+t_coordinate get_transform(t_player player, t_coordinate sprites[], int sprite_order[], int i)
 {
 
 	double sprite_x;
@@ -475,20 +475,23 @@ int draw(t_game *game)
 	
 	draw_walls(game, z_buffer);
 	populate_order(sprite_order, num_sprites);
-	populate_distance(game->player, sprites, num_sprites);
+	populate_distance(game->player, sprite_positions, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
 
 	// after sorting the sprites do the projection and draw them
 	for (int i = 0; i < num_sprites; i++)
 	{
-		sprites[i].trans = get_transform(game->player, sprites, sprite_order, i);
-		sprites[i].screen_x = (int)((screen_width / 2) * (1 + sprites[i].trans.x / sprites[i].trans.y));
-		sprites[i].res.height = abs((int)(screen_height / sprites[i].trans.y));
-		sprites[i].res.width = abs((int)(screen_height / sprites[i].trans.y));
-		sprites[i].draw_start = get_sprite_draw_start(sprites[i], game->res);
-		sprites[i].draw_end = get_sprite_draw_end(sprites[i], game->res);
+		t_sprite sprite;
+		sprite.x = sprite_positions[i].x;
+		sprite.y = sprite_positions[i].y;
+		sprite.trans = get_transform(game->player, sprite_positions, sprite_order, i);
+		sprite.screen_x = (int)((screen_width / 2) * (1 + sprite.trans.x / sprite.trans.y));
+		sprite.res.height = abs((int)(screen_height / sprite.trans.y));
+		sprite.res.width = abs((int)(screen_height / sprite.trans.y));
+		sprite.draw_start = get_sprite_draw_start(sprite, game->res);
+		sprite.draw_end = get_sprite_draw_end(sprite, game->res);
 
-		draw_sprite(game, sprites[i], z_buffer);
+		draw_sprite(game, sprite, z_buffer);
 	}
 
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
