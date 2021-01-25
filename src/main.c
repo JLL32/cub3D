@@ -23,7 +23,7 @@ typedef struct s_sprite
 
 
 
-t_sprite sprite[num_sprites] =
+t_sprite sprites[num_sprites] =
 {
 	//some pillars around the map
 	{21.5, 1.5},
@@ -369,7 +369,7 @@ void pupilate_distance(t_player player, t_sprite sprites[], int num)
 	i = 0;
 	while (i < num_sprites)
 	{
-		sprite_distance[i] = ((player.pos_x - sprites[i].x) * (player.pos_x - sprite[i].x) + (player.pos_y - sprites[i].y) * (player.pos_y - sprites[i].y));
+		sprite_distance[i] = ((player.pos_x - sprites[i].x) * (player.pos_x - sprites[i].x) + (player.pos_y - sprites[i].y) * (player.pos_y - sprites[i].y));
 		i++;
 	}
 }
@@ -383,8 +383,8 @@ t_coordinate get_transform(t_player player, t_sprite sprites[], int sprite_order
 	t_coordinate transform;
 
 	// translate sprite position to relative to camera
-	sprite_x = sprite[sprite_order[i]].x - player.pos_x;
-	sprite_y = sprite[sprite_order[i]].y - player.pos_y;
+	sprite_x = sprites[sprite_order[i]].x - player.pos_x;
+	sprite_y = sprites[sprite_order[i]].y - player.pos_y;
 
 	//transform sprite with the inverse camera matrix
 	// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
@@ -470,13 +470,13 @@ int draw(t_game *game)
 	
 	draw_walls(game, z_buffer);
 	pupilate_order(sprite_order, num_sprites);
-	pupilate_distance(game->player, sprite, num_sprites);
+	pupilate_distance(game->player, sprites, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
 
 	// after sorting the sprites do the projection and draw them
 	for (int i = 0; i < num_sprites; i++)
 	{
-		t_coordinate transform = get_transform(game->player, sprite, sprite_order, i);
+		t_coordinate transform = get_transform(game->player, sprites, sprite_order, i);
 		int sprite_screen_x = (int)((screen_width / 2) * (1 + transform.x / transform.y));
 		int sprite_height = abs((int)(screen_height / transform.y));
 		int sprite_width = abs((int)(screen_height / transform.y));
