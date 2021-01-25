@@ -355,7 +355,7 @@ void draw_walls(t_game *game, double z_buffer[])
 	}
 }
 
-void pupilate_order(int sprite_order[], int num)
+void populate_order(int sprite_order[], int num)
 {
 	int i;
 	
@@ -367,7 +367,7 @@ void pupilate_order(int sprite_order[], int num)
 	}
 }
 
-void pupilate_distance(t_player player, t_sprite sprites[], int num)
+void populate_distance(t_player player, t_sprite sprites[], int num)
 {
 	int i;
 	
@@ -418,14 +418,14 @@ t_square get_sprite_draw_start(t_sprite sprite, t_resolution res)
 }
 
 // calculates the highest pixels to fill of a sprite's stripe
-t_square get_sprite_draw_end(int sprite_height, int sprite_width, t_resolution res, int sprite_screen_x)
+t_square get_sprite_draw_end(t_sprite sprite, t_resolution res)
 {
 	t_square draw_end;
 
-	draw_end.y = sprite_height / 2 + res.height / 2;
+	draw_end.y = sprite.res.height / 2 + res.height / 2;
 	if (draw_end.y >= res.height)
 		draw_end.y = res.height - 1;
-	draw_end.x = sprite_width / 2 + sprite_screen_x;
+	draw_end.x = sprite.res.width / 2 + sprite.screen_x;
 	if (draw_end.x >= res.width)
 		draw_end.x = res.width - 1;
 	return (draw_end);
@@ -474,8 +474,8 @@ int draw(t_game *game)
 	double z_buffer[game->res.width];
 	
 	draw_walls(game, z_buffer);
-	pupilate_order(sprite_order, num_sprites);
-	pupilate_distance(game->player, sprites, num_sprites);
+	populate_order(sprite_order, num_sprites);
+	populate_distance(game->player, sprites, num_sprites);
 	sort_sprites(sprite_order, sprite_distance, num_sprites);
 
 	// after sorting the sprites do the projection and draw them
@@ -486,7 +486,7 @@ int draw(t_game *game)
 		sprites[i].res.height = abs((int)(screen_height / sprites[i].trans.y));
 		sprites[i].res.width = abs((int)(screen_height / sprites[i].trans.y));
 		sprites[i].draw_start = get_sprite_draw_start(sprites[i], game->res);
-		sprites[i].draw_end = get_sprite_draw_end(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
+		sprites[i].draw_end = get_sprite_draw_end(sprites[i], game->res);
 
 		draw_sprite(game, game->res, sprites[i].draw_start, sprites[i].draw_end, sprites[i].trans, sprites[i].res.width, sprites[i].res.height, sprites[i].screen_x, z_buffer);
 	}
