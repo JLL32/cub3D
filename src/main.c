@@ -404,14 +404,14 @@ t_coordinate get_transform(t_player player, t_sprite sprites[], int sprite_order
 }
 
 // calculates the lowest pixels to fill of a sprite's stripe
-t_square get_sprite_draw_start(int sprite_height, int sprite_width, t_resolution res, int sprite_screen_x)
+t_square get_sprite_draw_start(t_sprite sprite, t_resolution res)
 {
 	t_square draw_start;
 
-	draw_start.x = -sprite_width / 2 + sprite_screen_x;
+	draw_start.x = -sprite.res.width / 2 + sprite.screen_x;
 	if (draw_start.x < 0)
 		draw_start.x = 0;
-	draw_start.y = -sprite_height / 2 + res.height / 2;
+	draw_start.y = -sprite.res.height / 2 + res.height / 2;
 	if (draw_start.y < 0)
 		draw_start.y = 0;
 	return (draw_start);
@@ -485,7 +485,7 @@ int draw(t_game *game)
 		sprites[i].screen_x = (int)((screen_width / 2) * (1 + sprites[i].trans.x / sprites[i].trans.y));
 		sprites[i].res.height = abs((int)(screen_height / sprites[i].trans.y));
 		sprites[i].res.width = abs((int)(screen_height / sprites[i].trans.y));
-		sprites[i].draw_start = get_sprite_draw_start(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
+		sprites[i].draw_start = get_sprite_draw_start(sprites[i], game->res);
 		sprites[i].draw_end = get_sprite_draw_end(sprites[i].res.height, sprites[i].res.width, game->res, sprites[i].screen_x);
 
 		draw_sprite(game, game->res, sprites[i].draw_start, sprites[i].draw_end, sprites[i].trans, sprites[i].res.width, sprites[i].res.height, sprites[i].screen_x, z_buffer);
