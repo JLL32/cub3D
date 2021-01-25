@@ -477,6 +477,28 @@ void draw_sprite(t_game *game, t_sprite sprite, double z_buffer[])
 	}
 }
 
+void draw_every_sprite(t_game *game, double z_buffer[], int num)
+{
+	// arrays used to sort the sprites
+	t_sprite sprite;
+	int sprite_order[num];
+	double sprite_distance[num];
+	int i;
+
+	populate_order(sprite_order, num);
+	populate_distance(game->player, sprite_distance, sprite_positions, num);
+	sort_sprites(sprite_order, sprite_distance, num);
+
+	// after sorting the sprites do the projection and draw them
+	i = 0;
+	while (i < num)
+	{
+		sprite = get_sprite(game, sprite_order, i);
+		draw_sprite(game, sprite, z_buffer);
+		i++;
+	}
+}
+
 int draw(t_game *game)
 {
 	t_player *player = &game->player;
@@ -486,22 +508,7 @@ int draw(t_game *game)
 	
 	draw_walls(game, z_buffer);
 
-	// arrays used to sort the sprites
-	t_sprite sprite;
-	int sprite_order[num_sprites];
-	double sprite_distance[num_sprites];
-
-	populate_order(sprite_order, num_sprites);
-	populate_distance(game->player, sprite_distance, sprite_positions, num_sprites);
-	sort_sprites(sprite_order, sprite_distance, num_sprites);
-
-	// after sorting the sprites do the projection and draw them
-	for (int i = 0; i < num_sprites; i++)
-	{
-		sprite = get_sprite(game, sprite_order, i);
-		draw_sprite(game, sprite, z_buffer);
-	}
-
+	draw_every_sprite(game, z_buffer, num_sprites);
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
 	return 0;
 }
