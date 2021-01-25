@@ -314,16 +314,16 @@ void draw_vertical_line(t_game *game, int x, int start, int end, int color)
 }
 void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
 {
-	int y = draw.start;
+	int color;
+	int y;
+
+	y = draw.start;
 	while (y < draw.end)
 	{
 		// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
 		tex.y = (int)tex.pos & (tex_height - 1);
 		tex.pos += tex.step;
-		int color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
-		// make color darker for y-sides: R, G, B byte each divided through two with a shift and an and
-		if (stripe.side % 2 != 1)
-			color = (color >> 1) & 8355711;
+		color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
 		my_mlx_pixel_put(game, x, y, color);
 		y++;
 	}
