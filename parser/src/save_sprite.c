@@ -2,8 +2,8 @@
 
 static void	get_sprite_pos(t_config *config, int i, int j)
 {
-	config->sprites[config->sprite_count].x = j + 0.5;
-	config->sprites[config->sprite_count].y = i + 0.5;
+	config->sprites[config->sprite_count].x = i + 0.5;
+	config->sprites[config->sprite_count].y = j + 0.5;
 	config->sprite_count++;
 }
 

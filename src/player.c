@@ -27,7 +27,7 @@ t_player create_player(double x, double y, char dir)
 	player.pos_y = y;
 	player.dir_x = -1.0;
 	player.dir_y = 0.0;
-	player.move_speed = 0.2;
+	player.move_speed = 0.5;
 	player.rot_speed = 0.06;
 	player.plane_x = 0;
 	player.plane_y = .66;

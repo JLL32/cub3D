@@ -1,4 +1,4 @@
-R 1000 1000
+R 1000 700
 NO ./assets/bluestone.xpm
 WE ./assets/eagle.xpm
 SO ./assets/mossy.xpm
