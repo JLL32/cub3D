@@ -170,7 +170,7 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x , char **wor
 				side = 1;
 		}
 		/*check if ray has hit a wall*/
-		if (world_map[ray.map_pos.x][ray.map_pos.y] == '1')
+		if (world_map[ray.map_pos.y][ray.map_pos.x] == '1')
 			hit = 1;
 	}
 	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/

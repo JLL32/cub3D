@@ -12,7 +12,7 @@ $(NAME): $(SRCS) ./mlx/Makefile ./Makefile
 	make -C ./mlx/
 	make -C ./libft/
 	make -C ./parser/
-	CC $(SRCS) -L ./libft -lft -L ./parser -lparser -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	CC $(DFLAGS) $(SRCS) -L ./libft -lft -L ./parser -lparser -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 clean:
 	make -C ./mlx/ clean
@@ -25,6 +25,6 @@ fclean:
 	make -C ./libft/ fclean
 	rm cub3D
 
-re: clean all
+re: fclean all
 
 .PHONY: all clean fclean re
