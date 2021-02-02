@@ -1,9 +1,9 @@
-#include "cub3D.h"
+#include "../cub3D.h"
 #include <stdlib.h>
 
-#define GRAY 0x5A5A5A
-#define SKY_BLUE 0xADD8E6
-#define num_sprites 8
+//#define GRAY 0x5A5A5A
+//#define SKY_BLUE 0xADD8E6
+//#define num_sprites 8
 #define SPR_TEX_INDX 4
 
 typedef struct s_texture
@@ -13,7 +13,7 @@ typedef struct s_texture
 	int height;
 } t_texture;
 
-t_data textures[5];
+
 
 typedef struct s_sprite
 {
@@ -28,18 +28,18 @@ typedef struct s_sprite
 
 
 
-t_coordinate sprite_positions[num_sprites] =
-{
-	//some pillars around the map
-	{21.5, 1.5},
-	{15.5, 1.5},
-	{16.0, 1.8},
-	{16.2, 1.2},
-	{3.5, 2.5},
-	{9.5, 15.5},
-	{10.0, 15.1},
-	{10.5, 15.8},
-};
+// t_coordinate sprite_positions[num_sprites] =
+// {
+// 	//some pillars around the map
+// 	{21.5, 1.5},
+// 	{15.5, 1.5},
+// 	{16.0, 1.8},
+// 	{16.2, 1.2},
+// 	{3.5, 2.5},
+// 	{9.5, 15.5},
+// 	{10.0, 15.1},
+// 	{10.5, 15.8},
+// };
 
 
 // function used to sort the sprites
@@ -61,15 +61,16 @@ int key_press(int keycode, t_game *game)
 	//TODO: we'll have to make it check against characters of the map instead of numbers
 	
 	t_player *player = &game->player;
+	t_data *textures = game->textures;
 	if (keycode == KEY_UP)
-		move_up(player);
+		move_up(player, game->world_map);
 	if (keycode == KEY_DOWN)
-		move_down(player);
+		move_down(player, game->world_map);
 
 	if (keycode == KEY_RIGHT)
-		move_right(player);
+		move_right(player, game->world_map);
 	if (keycode == KEY_LEFT)
-		move_left(player);
+		move_left(player, game->world_map);
 
 	if (keycode == KEY_D)
 		turn_right(player);
@@ -139,7 +140,7 @@ void sort_sprites(int *order, double *dist, int amount)
 }
 
 // performs DDA
-t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_map **string*/)
+t_wall_stripe detect_wall(t_player *player, t_resolution res, int x , char **world_map)
 {
 	t_ray ray = cast_ray(*player, res.width, x);
 	int side;	 //was a NS or a EW wall hit?
@@ -169,7 +170,7 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x /*, world_ma
 				side = 1;
 		}
 		/*check if ray has hit a wall*/
-		if (world_map[ray.map_pos.x][ray.map_pos.y] > 0)
+		if (world_map[ray.map_pos.x][ray.map_pos.y] == '1')
 			hit = 1;
 	}
 	//Calculate the distance projected on camera direction (Euclidean distance will give fisheye effect!)*/
@@ -325,7 +326,7 @@ void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x,
 		// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
 		tex.y = (int)tex.pos & (tex_height - 1);
 		tex.pos += tex.step;
-		color = textures[stripe.side].addr[tex_height * tex.y + tex.x];
+		color = game->textures[stripe.side].addr[tex_height * tex.y + tex.x];
 		my_mlx_pixel_put(game, x, y, color);
 		y++;
 	}
@@ -341,7 +342,7 @@ void draw_walls(t_game *game, double z_buffer[])
 	x = 0;
 	while (x < game->res.width)
 	{
-		stripe = detect_wall(&game->player, game->res, x);
+		stripe = detect_wall(&game->player, game->res, x, game->world_map);
 		draw = get_drawing_interval(game->res.height, stripe.height);
 		tex = get_tex_stripe(stripe, game->res.height, draw);
 		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
@@ -431,9 +432,9 @@ t_square get_sprite_draw_end(t_sprite sprite, t_resolution res)
 t_sprite get_sprite(t_game *game, int sprite_order[], int i)
 {
 	t_sprite sprite;
-	sprite.x = sprite_positions[i].x;
-	sprite.y = sprite_positions[i].y;
-	sprite.trans = get_transform(game->player, sprite_positions, sprite_order, i);
+	sprite.x = game->sprite_positions[i].x;
+	sprite.y = game->sprite_positions[i].y;
+	sprite.trans = get_transform(game->player, game->sprite_positions, sprite_order, i);
 	sprite.screen_x = (int)((game->res.width / 2) * (1 + sprite.trans.x / sprite.trans.y));
 	sprite.res.height = abs((int)(game->res.height / sprite.trans.y));
 	sprite.res.width = abs((int)(game->res.height / sprite.trans.y));
@@ -467,7 +468,7 @@ void draw_sprite(t_game *game, t_sprite sprite, double z_buffer[])
 			{
 				d = (y)*256 - game->res.height * 128 + sprite.res.height * 128; //256 and 128 factors to avoid floats
 				tex_px.y = ((d * tex_height) / sprite.res.height) / 256;
-				color = textures[SPR_TEX_INDX].addr[tex_width * tex_px.y + tex_px.x]; //get current color from the texture
+				color = game->textures[SPR_TEX_INDX].addr[tex_width * tex_px.y + tex_px.x]; //get current color from the texture
 				if ((color & 0x00FFFFFF) != 0)
 					my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
 				y++;
@@ -486,7 +487,7 @@ void draw_every_sprite(t_game *game, double z_buffer[], int num)
 	int i;
 
 	populate_order(sprite_order, num);
-	populate_distance(game->player, sprite_distance, sprite_positions, num);
+	populate_distance(game->player, sprite_distance, game->sprite_positions, num);
 	sort_sprites(sprite_order, sprite_distance, num);
 
 	// after sorting the sprites do the projection and draw them
@@ -508,37 +509,67 @@ int draw(t_game *game)
 	
 	draw_walls(game, z_buffer);
 
-	draw_every_sprite(game, z_buffer, num_sprites);
+	draw_every_sprite(game, z_buffer, game->sprite_count);
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
 	return 0;
+}
+void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
+{
+	//TODO: don't forget to free texture paths
+	textures[0].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[0].width, &textures[0].height);
+	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
+
+	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we, &textures[1].width, &textures[1].height);
+	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
+
+	textures[2].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[2].width, &textures[2].height);
+	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
+
+	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea, &textures[3].width, &textures[3].height);
+	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
+
+	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp, &textures[4].width, &textures[4].height);
+	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
+	free(paths.so);
+	free(paths.we);
+	free(paths.no);
+	free(paths.ea);
+	free(paths.sp);
+}
+t_game create_game(int argc, char **argv)
+{
+	t_game game;
+	t_config cfg;
+	cfg = parse_file(argc, argv);
+	game.player = create_player(cfg.player.pos_x, cfg.player.pos_y, cfg.player.dir);
+	game.colors = cfg.colors;
+	game.res = cfg.res;
+	game.world_map = cfg.map;
+	game.sprite_positions = cfg.sprites;
+	game.sprite_count = cfg.sprite_count;
+	game.is_save = cfg.is_save;
+	game.mlx = mlx_init();
+	game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
+	game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
+	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, 
+	&game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
+	load_textures(cfg.tex, game.textures, game.mlx);
+	return (game);
 }
 
 int main(int argc, char *argv[argc])
 {
-	t_game game;
-	game.player = create_player();
-	game.colors = (t_colors){.ceiling = SKY_BLUE, .floor = GRAY};
-	game.res = (t_resolution){.height = 780, .width = 1080};
+	t_game game = create_game(argc, argv);
+	//game.player = create_player();
+	//game.colors = (t_colors){.ceiling = SKY_BLUE, .floor = GRAY};
+	//game.res = (t_resolution){.height = 780, .width = 1080};
 
-	game.mlx = mlx_init();
-	game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
-	game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
-	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, &game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
+	//game.mlx = mlx_init();
+	//game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
+	//game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
+	//game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, &game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
 
-	textures[0].img = mlx_xpm_file_to_image(game.mlx, "./assets/redbrick.xpm", &textures[0].width, &textures[0].height);
-	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 
-	textures[1].img = mlx_xpm_file_to_image(game.mlx, "./assets/greystone.xpm", &textures[1].width, &textures[1].height);
-	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
-
-	textures[2].img = mlx_xpm_file_to_image(game.mlx, "./assets/bluestone.xpm", &textures[2].width, &textures[2].height);
-	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
-
-	textures[3].img = mlx_xpm_file_to_image(game.mlx, "./assets/mossy.xpm", &textures[3].width, &textures[3].height);
-	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
-
-	textures[4].img = mlx_xpm_file_to_image(game.mlx, "./assets/pillar.xpm", &textures[4].width, &textures[4].height);
-	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
 
 	draw(&game);
 

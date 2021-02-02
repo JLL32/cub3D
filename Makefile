@@ -1,20 +1,29 @@
 NAME = cub3D
 CC = clang
-FLAGS = -Wall -Wextra -Werror -g -fsanitize=address
+FLAGS = -Wall -Wextra -Werror
+DFLAGS = -g -fsanitize=address
 SRCS = src/main.c src/player.c
 INCL = src/cub3D.h
 MLX = ./mlx/Makefile
 
 all: $(NAME)
 
-$(NAME): $(SRCS) $(INCL) ./mlx/Makefile
+$(NAME): $(SRCS) ./mlx/Makefile ./Makefile
 	make -C ./mlx/
-	CC $(SRCS) -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	make -C ./libft/
+	make -C ./parser/
+	CC $(SRCS) -L ./libft -lft -L ./parser -lparser -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 clean:
-	rm cub3D
+	make -C ./mlx/ clean
+	make -C ./parser/ clean
+	make -C ./libft/ clean
 
 fclean:
+	make -C ./mlx/ clean
+	make -C ./parser/ fclean
+	make -C ./libft/ fclean
+	rm cub3D
 
 re: clean all
 
