@@ -3,6 +3,35 @@
 
 #define SPR_TEX_INDX 4
 
+
+
+void exit_game(t_game *game, int status)
+{
+	int i;
+
+	i = 0;
+	while (game->world_map[i])
+	{
+		free(game->world_map[i]);
+		i++;
+	}
+	free(game->world_map);
+	mlx_destroy_image(game->mlx, game->textures[0].img);
+	mlx_destroy_image(game->mlx, game->textures[1].img);
+	mlx_destroy_image(game->mlx, game->textures[2].img);
+	mlx_destroy_image(game->mlx, game->textures[3].img);
+	mlx_destroy_image(game->mlx, game->textures[4].img);
+	mlx_destroy_image(game->mlx, game->win_buffer.img);
+	mlx_destroy_window(game->mlx, game->win);
+	exit(status);
+}
+
+int red_cross_press(t_game *game)
+{
+	exit_game(game, EXIT_SUCCESS);
+	return (0);
+}
+
 // function used to sort the sprites
 void sort_sprites(int *order, double *dist, int amount);
 
@@ -35,16 +64,7 @@ int key_press(int keycode, t_game *game)
 		turn_left(player);
 
 	if (keycode == KEY_ESC)
-	{
-		mlx_destroy_image(game->mlx, textures[0].img);
-		mlx_destroy_image(game->mlx, textures[1].img);
-		mlx_destroy_image(game->mlx, textures[2].img);
-		mlx_destroy_image(game->mlx, textures[3].img);
-		mlx_destroy_image(game->mlx, textures[4].img);
-		mlx_destroy_image(game->mlx, game->win_buffer.img);
-		mlx_destroy_window(game->mlx, game->win);
-		exit(EXIT_SUCCESS);
-	}
+		exit_game(game, EXIT_SUCCESS);
 
 	// TODO: don't forget to add escape and cross-red events which
 	// are quiting the game and cleaning after (imgs, textures, sprites...)
@@ -52,6 +72,8 @@ int key_press(int keycode, t_game *game)
 	draw(game);
 	return 0;
 }
+
+
 
 //sort algorithm
 //sort the sprites based on distance
@@ -516,6 +538,8 @@ t_game create_game(int argc, char **argv)
 	return (game);
 }
 
+
+
 int main(int argc, char *argv[argc])
 {
 	t_game game = create_game(argc, argv);
@@ -523,6 +547,7 @@ int main(int argc, char *argv[argc])
 	draw(&game);
 
 	mlx_hook(game.win, 2, 0, key_press, &game);
+	mlx_hook(game.win, 17, 0, red_cross_press, &game);
 
 	mlx_loop(game.mlx);
 
