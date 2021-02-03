@@ -94,10 +94,10 @@ typedef struct s_game
 	t_colors colors;
 	t_resolution res;
 	t_data textures[5];
-	t_coordinate *sprite_positions;
-	size_t sprite_count;
+	int sprite_count;
 	char **world_map;
 	bool is_save;
+	t_coordinate sprite_positions[200];
 } t_game;
 
 // typedef struct s_coordinate {

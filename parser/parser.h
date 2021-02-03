@@ -48,9 +48,9 @@ typedef struct s_config
 	t_textures_paths tex;
 	t_colors colors;
 	t_player_pos player;
-	t_coordinate sprites[200];
-	size_t sprite_count;
+	int sprite_count;
 	bool is_save;
+	t_coordinate sprites[200];
 } t_config;
 
 int					g_prev_len;

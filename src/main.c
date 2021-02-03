@@ -3,7 +3,7 @@
 
 //#define GRAY 0x5A5A5A
 //#define SKY_BLUE 0xADD8E6
-//#define num_sprites 8
+// #define num_sprites 8
 #define SPR_TEX_INDX 4
 
 typedef struct s_texture
@@ -28,17 +28,17 @@ typedef struct s_sprite
 
 
 
-// t_coordinate sprite_positions[num_sprites] =
+// t_coordinate sprite_pos[num_sprites] =
 // {
 // 	//some pillars around the map
-// 	{21.5, 1.5},
-// 	{15.5, 1.5},
-// 	{16.0, 1.8},
-// 	{16.2, 1.2},
 // 	{3.5, 2.5},
+// 	{9.5, 5.5},
 // 	{9.5, 15.5},
-// 	{10.0, 15.1},
-// 	{10.5, 15.8},
+// 	{10.5, 15.5},
+// 	{15.5, 1.5},
+// 	{16.5, 1.5},
+// 	{17.5, 1.5},
+// 	{21.5, 1.5},
 // };
 
 
@@ -59,7 +59,7 @@ int key_press(int keycode, t_game *game)
 {
 
 	//TODO: we'll have to make it check against characters of the map instead of numbers
-	
+
 	t_player *player = &game->player;
 	t_data *textures = game->textures;
 	if (keycode == KEY_UP)
@@ -165,9 +165,9 @@ t_wall_stripe detect_wall(t_player *player, t_resolution res, int x , char **wor
 			ray.side_dist.y += ray.delta_dist.y;
 			ray.map_pos.y += ray.step_dir.y;
 			if (ray.dir.y > 0)
-				side = 3;
-			else
 				side = 1;
+			else
+				side = 3;
 		}
 		/*check if ray has hit a wall*/
 		if (world_map[ray.map_pos.x][ray.map_pos.y] == '1')
@@ -338,10 +338,15 @@ void draw_walls(t_game *game, double z_buffer[])
 	t_interval draw;
 	t_tex_stripe tex;
 	int x;
-	
+
 	x = 0;
 	while (x < game->res.width)
 	{
+		// if (game->sprite_positions[0].x != 3.5)
+		// {
+		// 	printf("%d", x);
+		// 	exit(0);
+		// }
 		stripe = detect_wall(&game->player, game->res, x, game->world_map);
 		draw = get_drawing_interval(game->res.height, stripe.height);
 		tex = get_tex_stripe(stripe, game->res.height, draw);
@@ -356,7 +361,7 @@ void draw_walls(t_game *game, double z_buffer[])
 void populate_order(int sprite_order[], int num)
 {
 	int i;
-	
+
 	i = 0;
 	while (i < num)
 	{
@@ -368,7 +373,7 @@ void populate_order(int sprite_order[], int num)
 void populate_distance(t_player player, double sprite_distance[], t_coordinate sprites[], int num)
 {
 	int i;
-	
+
 	i = 0;
 	while (i < num)
 	{
@@ -504,7 +509,7 @@ int draw(t_game *game)
 {
 	t_player *player = &game->player;
 	double z_buffer[game->res.width];
-	
+
 	draw_walls(game, z_buffer);
 
 	draw_every_sprite(game, z_buffer, game->sprite_count);
@@ -514,13 +519,13 @@ int draw(t_game *game)
 void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
 {
 	//TODO: don't forget to free texture paths
-	textures[0].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[0].width, &textures[0].height);
+	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[0].width, &textures[0].height);
 	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 
 	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we, &textures[1].width, &textures[1].height);
 	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
 
-	textures[2].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[2].width, &textures[2].height);
+	textures[2].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[2].width, &textures[2].height);
 	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
 
 	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea, &textures[3].width, &textures[3].height);
@@ -528,9 +533,9 @@ void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
 
 	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp, &textures[4].width, &textures[4].height);
 	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
-	free(paths.so);
-	free(paths.we);
 	free(paths.no);
+	free(paths.we);
+	free(paths.so);
 	free(paths.ea);
 	free(paths.sp);
 }
@@ -543,13 +548,16 @@ t_game create_game(int argc, char **argv)
 	game.colors = cfg.colors;
 	game.res = cfg.res;
 	game.world_map = cfg.map;
-	game.sprite_positions = cfg.sprites;
+	// game.sprite_positions = sprite_pos;
+	// game.sprite_count = num_sprites;
+	//game.sprite_positions = cfg.sprites;
+	ft_memcpy(game.sprite_positions, cfg.sprites, cfg.sprite_count*sizeof(t_coordinate));
 	game.sprite_count = cfg.sprite_count;
 	game.is_save = cfg.is_save;
 	game.mlx = mlx_init();
 	game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
 	game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
-	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, 
+	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img,
 	&game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
 	load_textures(cfg.tex, game.textures, game.mlx);
 	return (game);
