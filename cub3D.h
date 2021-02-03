@@ -138,6 +138,16 @@ typedef struct s_tex_stripe {
 	double step;
 } t_tex_stripe;
 
+typedef struct s_sprite
+{
+	double x;
+	double y;
+	t_coordinate trans;
+	int screen_x;
+	t_resolution res;
+	t_square draw_start;
+	t_square draw_end;
+} t_sprite;
 /* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
 /* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
 /* 		t_resolution res, t_square step_dir); */

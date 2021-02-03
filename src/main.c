@@ -1,46 +1,7 @@
 #include "../cub3D.h"
 #include <stdlib.h>
 
-//#define GRAY 0x5A5A5A
-//#define SKY_BLUE 0xADD8E6
-// #define num_sprites 8
 #define SPR_TEX_INDX 4
-
-typedef struct s_texture
-{
-	void *add;
-	int width;
-	int height;
-} t_texture;
-
-
-
-typedef struct s_sprite
-{
-	double x;
-	double y;
-	t_coordinate trans;
-	int screen_x;
-	t_resolution res;
-	t_square draw_start;
-	t_square draw_end;
-} t_sprite;
-
-
-
-// t_coordinate sprite_pos[num_sprites] =
-// {
-// 	//some pillars around the map
-// 	{3.5, 2.5},
-// 	{9.5, 5.5},
-// 	{9.5, 15.5},
-// 	{10.5, 15.5},
-// 	{15.5, 1.5},
-// 	{16.5, 1.5},
-// 	{17.5, 1.5},
-// 	{21.5, 1.5},
-// };
-
 
 // function used to sort the sprites
 void sort_sprites(int *order, double *dist, int amount);
@@ -54,12 +15,8 @@ void my_mlx_pixel_put(t_game *game, int x, int y, int color)
 		buffer->addr[(y)*game->res.width + (x)] = color;
 }
 
-
 int key_press(int keycode, t_game *game)
 {
-
-	//TODO: we'll have to make it check against characters of the map instead of numbers
-
 	t_player *player = &game->player;
 	t_data *textures = game->textures;
 	if (keycode == KEY_UP)
@@ -518,7 +475,6 @@ int draw(t_game *game)
 }
 void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
 {
-	//TODO: don't forget to free texture paths
 	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[0].width, &textures[0].height);
 	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 
@@ -548,9 +504,6 @@ t_game create_game(int argc, char **argv)
 	game.colors = cfg.colors;
 	game.res = cfg.res;
 	game.world_map = cfg.map;
-	// game.sprite_positions = sprite_pos;
-	// game.sprite_count = num_sprites;
-	//game.sprite_positions = cfg.sprites;
 	ft_memcpy(game.sprite_positions, cfg.sprites, cfg.sprite_count*sizeof(t_coordinate));
 	game.sprite_count = cfg.sprite_count;
 	game.is_save = cfg.is_save;
@@ -566,16 +519,6 @@ t_game create_game(int argc, char **argv)
 int main(int argc, char *argv[argc])
 {
 	t_game game = create_game(argc, argv);
-	//game.player = create_player();
-	//game.colors = (t_colors){.ceiling = SKY_BLUE, .floor = GRAY};
-	//game.res = (t_resolution){.height = 780, .width = 1080};
-
-	//game.mlx = mlx_init();
-	//game.win = mlx_new_window(game.mlx, game.res.width, game.res.height, "Cub3D");
-	//game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
-	//game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img, &game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
-
-
 
 	draw(&game);
 
