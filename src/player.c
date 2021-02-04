@@ -25,46 +25,21 @@
 
 t_player create_player(double x, double y, char dir)
 {
-	// TODO: position coordinates need to be initiated from the parser
 	t_player player;
-	/* player.pos_x = x; */
-	/* player.pos_y = y; */
-	/* player.dir_x = -1.0; */
-	/* player.dir_y = 0.0; */
-	/* player.move_speed = 0.5; */
-	/* player.rot_speed = 0.06; */
-	/* player.plane_x = 0; */
-	/* player.plane_y = .66; */
 	if (dir == 'N')
 	{
-		/* player.dir_x = -1; */
-		/* player.dir_y = 0; */
-		/* player.plane_x = 0; */
-		/* player.plane_y = .66; */
-		player = (t_player){x, y, 1, 0, MOVE_SPD, ROT_SPD, 0, PLANE};
+		player = (t_player){x, y, -1, 0, MOVE_SPD, ROT_SPD, 0, PLANE};
 	}
 	else if (dir == 'W')
 	{
-		/* player.dir_x = 0; */
-		/* player.dir_y = -1; */
-		/* player.plane_x = .66; */
-		/* player.plane_y = 0; */
-		player = (t_player){x, y, 0, -1, MOVE_SPD, ROT_SPD, PLANE, 0};
+		player = (t_player){x, y, 0, -1, MOVE_SPD, ROT_SPD, -PLANE, 0};
 	}
 	else if (dir == 'S')
 	{
-		/* player.dir_x = 1; */
-		/* player.dir_y = 0; */
-		/* player.plane_x = 0; */
-		/* player.plane_y = .66; */
-		player = (t_player){x, y, -1, 0, MOVE_SPD, ROT_SPD, 0, PLANE};
+		player = (t_player){x, y, 1, 0, MOVE_SPD, ROT_SPD, 0, -PLANE};
 	}
 	else if (dir == 'E')
 	{
-		/* player.dir_x = 0; */
-		/* player.dir_y = 1; */
-		/* player.plane_x = .66; */
-		/* player.plane_y = 0; */
 		player = (t_player){x, y, 0, 1, MOVE_SPD, ROT_SPD, PLANE, 0};
 	}
 	return player;

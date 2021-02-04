@@ -497,16 +497,21 @@ int draw(t_game *game)
 }
 void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
 {
-	textures[0].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[0].width, &textures[0].height);
+	// 0: North texture
+	// 1: West texture
+	// 2: South texture
+	// 3: East texture
+	
+	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[0].width, &textures[0].height);
 	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
 
-	textures[1].img = mlx_xpm_file_to_image(mlx, paths.ea, &textures[1].width, &textures[1].height);
+	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we, &textures[1].width, &textures[1].height);
 	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
 
-	textures[2].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[2].width, &textures[2].height);
+	textures[2].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[2].width, &textures[2].height);
 	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
 
-	textures[3].img = mlx_xpm_file_to_image(mlx, paths.we, &textures[3].width, &textures[3].height);
+	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea, &textures[3].width, &textures[3].height);
 	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
 
 	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp, &textures[4].width, &textures[4].height);
