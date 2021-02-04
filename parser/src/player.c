@@ -23,6 +23,7 @@ static void	get_player_pos_map(t_config *config, int i, int j)
 	player->pos_x = i;
 	player->pos_y = j;
 	player->dir = map[i][j];
+	map[i][j] = '0';
 }
 
 int		is_player(t_config *config, int i, int j)
