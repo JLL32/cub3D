@@ -1,28 +1,5 @@
 #include "../cub3D.h"
 
-/* typedef struct s_player { */
-/* 	double pos_x; */
-/* 	double pos_y; */
-/* 	double dir_x; */
-/* 	double dir_y; */
-/* 	double move_speed; */
-/* 	double rot_speed; */
-/* 	double plane_x; */
-/* 	double plane_y; */
-/* } t_player; */
-
-/* t_player create_player(); */
-/* void move_up(t_player *player); */
-/* void move_down(t_player *player); */
-/* void move_right(t_player *player); */
-/* void move_left(t_player *player); */
-/* void turn_right(t_player *player); */
-/* void turn_left(t_player *player); */
-
-# define PLANE .66
-# define MOVE_SPD 0.2
-# define ROT_SPD .06
-
 t_player create_player(double x, double y, char dir)
 {
 	t_player player;
@@ -42,7 +19,7 @@ t_player create_player(double x, double y, char dir)
 	{
 		player = (t_player){x, y, 0, 1, MOVE_SPD, ROT_SPD, PLANE, 0};
 	}
-	return player;
+	return (player);
 }
 
 void move_up(t_player *player, char **world_map)

@@ -1,9 +1,4 @@
 #include "../cub3D.h"
-#include <stdlib.h>
-
-#define SPR_TEX_INDX 4
-
-
 
 void exit_game(t_game *game, int status)
 {
@@ -32,7 +27,6 @@ int red_cross_press(t_game *game)
 	return (0);
 }
 
-// function used to sort the sprites
 void sort_sprites(int *order, double *dist, int amount);
 
 int draw(t_game *game);
@@ -40,14 +34,18 @@ t_ray cast_ray(t_player player, int win_width, int x);
 void my_mlx_pixel_put(t_game *game, int x, int y, int color)
 {
 	t_data *buffer = &game->win_buffer;
-	if (y < game->res.height && y >= 0)
-		buffer->addr[(y)*game->res.width + (x)] = color;
+		if (y < game->res.height && y >= 0)
+			buffer->addr[(y)*game->res.width + (x)] = color;
 }
 
 int key_press(int keycode, t_game *game)
 {
-	t_player *player = &game->player;
-	t_data *textures = game->textures;
+	t_player *player;
+	t_data *textures;
+
+	player = &game->player;
+	textures = game->textures;
+
 	if (keycode == KEY_UP)
 		move_up(player, game->world_map);
 	if (keycode == KEY_DOWN)
@@ -66,14 +64,9 @@ int key_press(int keycode, t_game *game)
 	if (keycode == KEY_ESC)
 		exit_game(game, EXIT_SUCCESS);
 
-	// TODO: don't forget to add escape and cross-red events which
-	// are quiting the game and cleaning after (imgs, textures, sprites...)
-
 	draw(game);
 	return 0;
 }
-
-
 
 //sort algorithm
 //sort the sprites based on distance
@@ -89,7 +82,7 @@ void swap(t_pair *xp, t_pair *yp)
 	*xp = *yp;
 	*yp = temp;
 }
-// A function to implement bubble sort
+
 void pair_sort(t_pair arr[], int n)
 {
 	int i, j;
@@ -275,16 +268,17 @@ t_tex_stripe get_tex_stripe(t_wall_stripe stripe, int height, t_interval draw)
 	double step;
 	// Starting texture coordinat
 	double pos;
-	tex_x = (int)(stripe.wall_x * (double)(tex_width));
+	tex_x = (int)(stripe.wall_x * (double)(TEX_WIDTH));
 	if (stripe.side == 0)
-		tex_x = tex_width - tex_x - 1;
+		tex_x = TEX_WIDTH - tex_x - 1;
 	if (stripe.side == 3)
-		tex_x = tex_width - tex_x - 1;
+		tex_x = TEX_WIDTH - tex_x - 1;
 
-	step = 1.0 * tex_height / stripe.height;
+	step = 1.0 * TEX_HEIGHT / stripe.height;
 	pos = (draw.start - height / 2.0 + stripe.height / 2.0) * step;
 	return ((t_tex_stripe){tex_x, 0, pos, step});
 }
+
 void draw_vertical_line(t_game *game, int x, int start, int end, int color)
 {
 	int y = start;
@@ -294,6 +288,7 @@ void draw_vertical_line(t_game *game, int x, int start, int end, int color)
 		y++;
 	}
 }
+
 void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
 {
 	int color;
@@ -302,10 +297,10 @@ void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x,
 	y = draw.start;
 	while (y < draw.end)
 	{
-		// cast the texture coordinat to integer, and mask with (tex_height - 1) in case of overflow
-		tex.y = (int)tex.pos & (tex_height - 1);
+		// cast the texture coordinat to integer, and mask with (TEX_HEIGHT - 1) in case of overflow
+		tex.y = (int)tex.pos & (TEX_HEIGHT - 1);
 		tex.pos += tex.step;
-		color = game->textures[stripe.side].addr[tex_height * tex.y + tex.x];
+		color = game->textures[stripe.side].addr[TEX_HEIGHT * tex.y + tex.x];
 		my_mlx_pixel_put(game, x, y, color);
 		y++;
 	}
@@ -321,11 +316,6 @@ void draw_walls(t_game *game, double z_buffer[])
 	x = 0;
 	while (x < game->res.width)
 	{
-		// if (game->sprite_positions[0].x != 3.5)
-		// {
-		// 	printf("%d", x);
-		// 	exit(0);
-		// }
 		stripe = detect_wall(&game->player, game->res, x, game->world_map);
 		draw = get_drawing_interval(game->res.height, stripe.height);
 		tex = get_tex_stripe(stripe, game->res.height, draw);
@@ -444,15 +434,15 @@ void draw_sprite(t_game *game, t_sprite sprite, double z_buffer[])
 	stripe = sprite.draw_start.x;
 	while (stripe < sprite.draw_end.x)
 	{
-		tex_px.x = (int)(256 * (stripe - (-sprite.res.width / 2 + sprite.screen_x)) * tex_width / sprite.res.width) / 256;
+		tex_px.x = (int)(256 * (stripe - (-sprite.res.width / 2 + sprite.screen_x)) * TEX_WIDTH / sprite.res.width) / 256;
 		if (sprite.trans.y > 0 && stripe > 0 && stripe < game->res.width && sprite.trans.y < z_buffer[stripe])
 		{
 			y = sprite.draw_start.y;
 			while (y < sprite.draw_end.y) //for every pixel of the current stripe
 			{
 				d = (y)*256 - game->res.height * 128 + sprite.res.height * 128; //256 and 128 factors to avoid floats
-				tex_px.y = ((d * tex_height) / sprite.res.height) / 256;
-				color = game->textures[SPR_TEX_INDX].addr[tex_width * tex_px.y + tex_px.x]; //get current color from the texture
+				tex_px.y = ((d * TEX_HEIGHT) / sprite.res.height) / 256;
+				color = game->textures[SP_TEX].addr[TEX_WIDTH * tex_px.y + tex_px.x]; //get current color from the texture
 				if ((color & 0x00FFFFFF) != 0)
 					my_mlx_pixel_put(game, stripe, y, color); //paint pixel if it isn't black, black is the invisible color
 				y++;
@@ -495,33 +485,37 @@ int draw(t_game *game)
 	mlx_put_image_to_window(game->mlx, game->win, game->win_buffer.img, 0, 0);
 	return 0;
 }
+
 void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
 {
-	// 0: North texture
-	// 1: West texture
-	// 2: South texture
-	// 3: East texture
-	
-	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no, &textures[0].width, &textures[0].height);
-	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img, &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
-
-	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we, &textures[1].width, &textures[1].height);
-	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img, &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
-
-	textures[2].img = mlx_xpm_file_to_image(mlx, paths.so, &textures[2].width, &textures[2].height);
-	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img, &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
-
-	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea, &textures[3].width, &textures[3].height);
-	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img, &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
-
-	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp, &textures[4].width, &textures[4].height);
-	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img, &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
+	// TODO: check if textures are valid
+	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no,
+	 &textures[0].width, &textures[0].height);
+	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img,
+	 &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
+	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we,
+	 &textures[1].width, &textures[1].height);
+	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img,
+	 &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
+	textures[2].img = mlx_xpm_file_to_image(mlx, paths.so,
+	 &textures[2].width, &textures[2].height);
+	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img,
+	 &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
+	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea,
+	 &textures[3].width, &textures[3].height);
+	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img,
+	 &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
+	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp,
+	 &textures[4].width, &textures[4].height);
+	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img,
+	 &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
 	free(paths.no);
 	free(paths.we);
 	free(paths.so);
 	free(paths.ea);
 	free(paths.sp);
 }
+
 t_game create_game(int argc, char **argv)
 {
 	t_game game;
@@ -543,18 +537,12 @@ t_game create_game(int argc, char **argv)
 	return (game);
 }
 
-
-
 int main(int argc, char *argv[argc])
 {
 	t_game game = create_game(argc, argv);
-
 	draw(&game);
-
 	mlx_hook(game.win, 2, 0, key_press, &game);
 	mlx_hook(game.win, 17, 0, red_cross_press, &game);
-
 	mlx_loop(game.mlx);
-
 	return (0);
 }
