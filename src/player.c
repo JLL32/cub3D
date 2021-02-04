@@ -20,7 +20,7 @@
 /* void turn_left(t_player *player); */
 
 # define PLANE .66
-# define MOVE_SPD 0.5
+# define MOVE_SPD 0.2
 # define ROT_SPD .06
 
 t_player create_player(double x, double y, char dir)
