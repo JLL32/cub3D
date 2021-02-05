@@ -2,7 +2,19 @@ NAME = cub3D
 CC = clang
 FLAGS = -Wall -Wextra -Werror
 DFLAGS = -g -fsanitize=address
-SRCS = src/main.c src/player.c src/screenshot.c
+SRCS = src/main.c \
+		src/player.c \
+		src/player2.c \
+		src/game.c \
+		src/game2.c \
+		src/draw.c \
+		src/draw_walls.c \
+		src/draw_sprites.c \
+		src/raycasting.c \
+		src/raycasting2.c \
+		src/sprite.c \
+		src/sort_sprites.c \
+		src/screenshot.c
 INCL = src/cub3D.h
 MLX = ./mlx/Makefile
 

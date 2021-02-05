@@ -46,15 +46,6 @@ typedef struct s_player {
 	double plane_y;
 } t_player;
 
-// typedef struct s_resolution {
-// 	int height;
-// 	int width;
-// } t_resolution;
-
-// typedef struct s_colors {
-// 	int floor;
-// 	int ceiling;
-// } t_colors;
 
 typedef struct s_game
 {
@@ -71,10 +62,6 @@ typedef struct s_game
 	t_coordinate sprite_positions[200];
 } t_game;
 
-// typedef struct s_coordinate {
-// 	double x;
-// 	double y;
-// } t_coordinate;
 
 typedef struct s_square {
 	int x;
@@ -109,6 +96,12 @@ typedef struct s_tex_stripe {
 	double step;
 } t_tex_stripe;
 
+typedef struct s_pair
+{
+	double first;
+	int second;
+} t_pair;
+
 typedef struct s_sprite
 {
 	double x;
@@ -142,9 +135,30 @@ typedef struct		s_bitmapheader{
 	int			width_in_bytes;
 	int			fd;
 }					t_bitmapheader;
-/* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
-/* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
-/* 		t_resolution res, t_square step_dir); */
+
+
+t_game create_game(int argc, char **argv);
+void exit_game(t_game *game, int status);
+int on_key_press(int keycode, t_game *game);
+int on_red_cross_press(t_game *game);
+
+int draw(t_game *game);
+void my_mlx_pixel_put(t_game *game, int x, int y, int color);
+void draw_vertical_line(t_game *game, int x, int start, int end, int color);
+
+t_ray cast_ray(t_player player, int win_width, int x);
+t_wall_stripe detect_wall(t_player *player, 
+t_resolution res, int x , char **world_map);
+
+void draw_walls(t_game *game, double z_buffer[]);
+
+t_sprite get_sprite(t_game *game, int sprite_order[], int i);
+void draw_sprite(t_game *game, t_sprite sprite, double z_buffer[]);
+
+void sort_sprites(int *order, double *dist, int amount);
+
+void draw_every_sprite(t_game *game, double z_buffer[], int num);
+
 
 t_player create_player(double x, double y, char dir);
 void move_up(t_player *player, char **world_map);

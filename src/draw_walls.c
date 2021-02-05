@@ -1,0 +1,70 @@
+#include "../cub3D.h"
+
+static t_tex_stripe get_tex_stripe(t_wall_stripe stripe, int height, t_interval draw)
+{
+	// x coordinate on the texture
+	int tex_x;
+	// How much to increase the texture coordinate per screen pixel
+	double step;
+	// Starting texture coordinat
+	double pos;
+	tex_x = (int)(stripe.wall_x * (double)(TEX_WIDTH));
+	if (stripe.side == 0)
+		tex_x = TEX_WIDTH - tex_x - 1;
+	if (stripe.side == 3)
+		tex_x = TEX_WIDTH - tex_x - 1;
+
+	step = 1.0 * TEX_HEIGHT / stripe.height;
+	pos = (draw.start - height / 2.0 + stripe.height / 2.0) * step;
+	return ((t_tex_stripe){tex_x, 0, pos, step});
+}
+
+static void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
+{
+	int color;
+	int y;
+
+	y = draw.start;
+	while (y < draw.end)
+	{
+		// cast the texture coordinat to integer, and mask with (TEX_HEIGHT - 1) in case of overflow
+		tex.y = (int)tex.pos & (TEX_HEIGHT - 1);
+		tex.pos += tex.step;
+		color = game->textures[stripe.side].addr[TEX_HEIGHT * tex.y + tex.x];
+		my_mlx_pixel_put(game, x, y, color);
+		y++;
+	}
+}
+/*calculate the lowest and highest pixel fo fill in the current stripe*/
+static t_interval get_drawing_interval(int win_height, int stripe_height)
+{
+	t_interval interval;
+	interval.start = -stripe_height / 2 + win_height / 2;
+	if (interval.start < 0)
+		interval.start = 0;
+	interval.end = stripe_height / 2 + win_height / 2;
+	if (interval.end >= win_height)
+		interval.end = win_height - 1;
+	return  (interval);
+}
+
+void draw_walls(t_game *game, double z_buffer[])
+{
+	t_wall_stripe stripe;
+	t_interval draw;
+	t_tex_stripe tex;
+	int x;
+
+	x = 0;
+	while (x < game->res.width)
+	{
+		stripe = detect_wall(&game->player, game->res, x, game->world_map);
+		draw = get_drawing_interval(game->res.height, stripe.height);
+		tex = get_tex_stripe(stripe, game->res.height, draw);
+		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
+		draw_tex_stripe(game, stripe, tex, x, draw);
+		draw_vertical_line(game, x, draw.end, game->res.height, game->colors.floor);
+		z_buffer[x] = stripe.dist;
+		x++;
+	}
+}
