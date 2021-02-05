@@ -12,11 +12,13 @@ void exit_game(t_game *game, int status)
 		i++;
 	}
 	free(game->world_map);
-	mlx_destroy_image(game->mlx, game->textures[0].img);
-	mlx_destroy_image(game->mlx, game->textures[1].img);
-	mlx_destroy_image(game->mlx, game->textures[2].img);
-	mlx_destroy_image(game->mlx, game->textures[3].img);
-	mlx_destroy_image(game->mlx, game->textures[4].img);
+	i = 0;
+	while (i < 5)
+	{
+		if (game->textures[i].img)
+			mlx_destroy_image(game->mlx, game->textures[i].img);
+		i++;
+	}
 	mlx_destroy_image(game->mlx, game->win_buffer.img);
 	mlx_destroy_window(game->mlx, game->win);
 	exit(status);
@@ -487,34 +489,42 @@ int draw(t_game *game)
 	return 0;
 }
 
-void load_textures(t_textures_paths paths, t_data *textures, void *mlx)
+void init_textures(t_data *textures)
 {
-	// TODO: check if textures are valid
-	textures[0].img = mlx_xpm_file_to_image(mlx, paths.no,
-	 &textures[0].width, &textures[0].height);
-	textures[0].addr = (int *)mlx_get_data_addr(textures[0].img,
-	 &textures[0].bits_per_pixel, &textures[0].line_length, &textures[0].endian);
-	textures[1].img = mlx_xpm_file_to_image(mlx, paths.we,
-	 &textures[1].width, &textures[1].height);
-	textures[1].addr = (int *)mlx_get_data_addr(textures[1].img,
-	 &textures[1].bits_per_pixel, &textures[1].line_length, &textures[1].endian);
-	textures[2].img = mlx_xpm_file_to_image(mlx, paths.so,
-	 &textures[2].width, &textures[2].height);
-	textures[2].addr = (int *)mlx_get_data_addr(textures[2].img,
-	 &textures[2].bits_per_pixel, &textures[2].line_length, &textures[2].endian);
-	textures[3].img = mlx_xpm_file_to_image(mlx, paths.ea,
-	 &textures[3].width, &textures[3].height);
-	textures[3].addr = (int *)mlx_get_data_addr(textures[3].img,
-	 &textures[3].bits_per_pixel, &textures[3].line_length, &textures[3].endian);
-	textures[4].img = mlx_xpm_file_to_image(mlx, paths.sp,
-	 &textures[4].width, &textures[4].height);
-	textures[4].addr = (int *)mlx_get_data_addr(textures[4].img,
-	 &textures[4].bits_per_pixel, &textures[4].line_length, &textures[4].endian);
-	free(paths.no);
-	free(paths.we);
-	free(paths.so);
-	free(paths.ea);
-	free(paths.sp);
+	textures[0].img = NULL;
+	textures[1].img = NULL;
+	textures[2].img = NULL;
+	textures[3].img = NULL;
+	textures[4].img = NULL;
+}
+
+t_data load_texture(char *path, t_game *game)
+{
+	t_data texture_buffer;
+	texture_buffer.img = mlx_xpm_file_to_image(game->mlx, path,
+	 	&texture_buffer.width, &texture_buffer.height);
+	free(path);
+	if(texture_buffer.img == NULL
+	|| texture_buffer.width != 64
+	|| texture_buffer.height != 64)
+	{
+		ft_putstr_fd("ERROR: Invalid texture", 2);
+		exit_game(game, EXIT_FAILURE);
+	}
+	texture_buffer.addr = (int *)mlx_get_data_addr(texture_buffer.img,
+	 	&texture_buffer.bits_per_pixel, &texture_buffer.line_length, 
+	 	&texture_buffer.endian);
+	return (texture_buffer);
+}
+
+void load_textures(t_textures_paths paths, t_game *game)
+{
+	init_textures(game->textures);
+	game->textures[0] = load_texture(paths.no, game);
+	game->textures[1] = load_texture(paths.we, game);
+	game->textures[2] = load_texture(paths.so, game);
+	game->textures[3] = load_texture(paths.ea, game);
+	game->textures[4] = load_texture(paths.sp, game);
 }
 
 t_game create_game(int argc, char **argv)
@@ -534,7 +544,7 @@ t_game create_game(int argc, char **argv)
 	game.win_buffer.img = mlx_new_image(game.mlx, game.res.width, game.res.height);
 	game.win_buffer.addr = (int *)mlx_get_data_addr(game.win_buffer.img,
 	&game.win_buffer.bits_per_pixel, &game.win_buffer.line_length, &game.win_buffer.endian);
-	load_textures(cfg.tex, game.textures, game.mlx);
+	load_textures(cfg.tex, &game);
 	return (game);
 }
 
