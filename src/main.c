@@ -1,4 +1,5 @@
 #include "../cub3D.h"
+#include <stdlib.h>
 
 void exit_game(t_game *game, int status)
 {
@@ -543,6 +544,11 @@ int main(int argc, char *argv[argc])
 	draw(&game);
 	mlx_hook(game.win, 2, 0, key_press, &game);
 	mlx_hook(game.win, 17, 0, red_cross_press, &game);
+	if (game.is_save)
+	{
+		take_screenshot(game);
+		exit_game(&game, EXIT_SUCCESS);
+	}
 	mlx_loop(game.mlx);
 	return (0);
 }

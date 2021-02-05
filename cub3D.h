@@ -119,6 +119,29 @@ typedef struct s_sprite
 	t_square draw_start;
 	t_square draw_end;
 } t_sprite;
+
+typedef struct		s_screenshot
+{
+	int				width_bytes;
+	int				padding_size;
+	int				stride;
+	unsigned char	*file_header;
+	unsigned char	*info_header;
+}					t_screenshot;
+int					g_player_count;
+typedef struct		s_bitmapheader{
+	uint32_t	file_size;
+	uint32_t	off_bits;
+	uint32_t	size;
+	uint32_t	info_size;
+	int32_t		width;
+	int32_t		height;
+	uint16_t	planes;
+	uint16_t	bit_count;
+	uint32_t	image_size;
+	int			width_in_bytes;
+	int			fd;
+}					t_bitmapheader;
 /* t_wall_stripe detect_wall(t_player *player, t_coordinate side_dist, */
 /* 		t_coordinate delta_dist, t_coordinate ray_dir, t_square map, */
 /* 		t_resolution res, t_square step_dir); */
@@ -130,4 +153,7 @@ void move_right(t_player *player, char **world_map);
 void move_left(t_player *player, char **world_map);
 void turn_right(t_player *player);
 void turn_left(t_player *player);
+
+
+void	take_screenshot(t_game game);
 #endif
