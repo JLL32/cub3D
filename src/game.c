@@ -39,14 +39,14 @@ static t_data load_texture(char *path, t_game *game)
 	 	&texture_buffer.width, &texture_buffer.height);
 	free(path);
 	if(texture_buffer.img == NULL
-	|| texture_buffer.width != 64
-	|| texture_buffer.height != 64)
+	|| texture_buffer.width != TEX_WIDTH
+	|| texture_buffer.height != TEX_HEIGHT)
 	{
 		ft_putstr_fd("ERROR: Invalid texture", 2);
 		exit_game(game, EXIT_FAILURE);
 	}
 	texture_buffer.addr = (int *)mlx_get_data_addr(texture_buffer.img,
-	 	&texture_buffer.bits_per_pixel, &texture_buffer.line_length, 
+	 	&texture_buffer.bits_per_pixel, &texture_buffer.line_length,
 	 	&texture_buffer.endian);
 	return (texture_buffer);
 }

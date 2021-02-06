@@ -1,6 +1,9 @@
 #include "../cub3D.h"
 
-//calculate ray position and direction
+/*
+ ** calculate ray position and direction
+*/
+
 static t_coordinate get_ray_dir(t_player player, int win_width, int x)
 {
 	double camera_x;
@@ -12,7 +15,10 @@ static t_coordinate get_ray_dir(t_player player, int win_width, int x)
 	return ray_dir;
 }
 
-//length of ray from current position to next x or y-side
+/*
+** length of ray from current position to next x or y-side
+*/
+
 static t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 		t_square map, t_player player)
 {
@@ -37,7 +43,10 @@ static t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 	return side_dist;
 }
 
-//what direction to step in x or y-direction (either +1 or -1)
+/*
+** what direction to step in x or y-direction (either +1 or -1)
+*/
+
 static t_square get_step_dir(t_coordinate ray_dir)
 {
 	t_square step_dir;
@@ -61,7 +70,7 @@ static t_square get_step_dir(t_coordinate ray_dir)
 	return step_dir;
 }
 
-t_ray cast_ray(t_player player, int win_width, int x)
+t_ray get_ray(t_player player, int win_width, int x)
 {
 	t_ray ray;
 	ray.dir = get_ray_dir(player, win_width, x);

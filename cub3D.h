@@ -146,8 +146,8 @@ int draw(t_game *game);
 void my_mlx_pixel_put(t_game *game, int x, int y, int color);
 void draw_vertical_line(t_game *game, int x, int start, int end, int color);
 
-t_ray cast_ray(t_player player, int win_width, int x);
-t_wall_stripe detect_wall(t_player *player, 
+t_ray get_ray(t_player player, int win_width, int x);
+t_wall_stripe cast_ray(t_player *player, 
 t_resolution res, int x , char **world_map);
 
 void draw_walls(t_game *game, double z_buffer[]);

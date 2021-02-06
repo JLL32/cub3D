@@ -1,13 +1,19 @@
 #include "../cub3D.h"
 
+
+/*
+ ** returns necessary info to draw texture stripe:
+ ** - x coordinate on the texture
+ ** - How much to increase the texture coordinate per screen pixel
+ ** - Starting texture coordinate
+*/
+
 static t_tex_stripe get_tex_stripe(t_wall_stripe stripe, int height, t_interval draw)
 {
-	// x coordinate on the texture
 	int tex_x;
-	// How much to increase the texture coordinate per screen pixel
 	double step;
-	// Starting texture coordinat
 	double pos;
+
 	tex_x = (int)(stripe.wall_x * (double)(TEX_WIDTH));
 	if (stripe.side == 0)
 		tex_x = TEX_WIDTH - tex_x - 1;
@@ -19,7 +25,7 @@ static t_tex_stripe get_tex_stripe(t_wall_stripe stripe, int height, t_interval 
 	return ((t_tex_stripe){tex_x, 0, pos, step});
 }
 
-static void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
+static void draw_tex_stripe(t_game *game, t_wall_stripe stripe, t_tex_stripe tex, int x, t_interval draw)
 {
 	int color;
 	int y;
@@ -27,7 +33,6 @@ static void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex,
 	y = draw.start;
 	while (y < draw.end)
 	{
-		// cast the texture coordinat to integer, and mask with (TEX_HEIGHT - 1) in case of overflow
 		tex.y = (int)tex.pos & (TEX_HEIGHT - 1);
 		tex.pos += tex.step;
 		color = game->textures[stripe.side].addr[TEX_HEIGHT * tex.y + tex.x];
@@ -35,7 +40,11 @@ static void draw_tex_stripe(t_game *game,t_wall_stripe stripe, t_tex_stripe tex,
 		y++;
 	}
 }
-/*calculate the lowest and highest pixel fo fill in the current stripe*/
+
+/*
+** calculate the lowest and highest pixel fo fill in the current stripe
+*/
+
 static t_interval get_drawing_interval(int win_height, int stripe_height)
 {
 	t_interval interval;
@@ -58,7 +67,7 @@ void draw_walls(t_game *game, double z_buffer[])
 	x = 0;
 	while (x < game->res.width)
 	{
-		stripe = detect_wall(&game->player, game->res, x, game->world_map);
+		stripe = cast_ray(&game->player, game->res, x, game->world_map);
 		draw = get_drawing_interval(game->res.height, stripe.height);
 		tex = get_tex_stripe(stripe, game->res.height, draw);
 		draw_vertical_line(game, x, 0, draw.start, game->colors.ceiling);
