@@ -6,7 +6,7 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 19:58:03 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 18:05:32 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/06 18:47:33 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,13 @@ static int		check_resolution_error(char **resolution, int i)
 
 t_resolution	save_resolution(char **resolution)
 {
-	// TODO: check for duplication assat
 	t_resolution res;
+	static int res_count;
 	int i;
 
+	if (res_count > 0)
+		ft_error(NULL, "Error\n Duplicated resolution");
+	res_count++;
 	i = 1;
 	while (resolution[i])
 	{
