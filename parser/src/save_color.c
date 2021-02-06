@@ -6,14 +6,14 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 18:49:03 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 18:12:28 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/06 18:31:35 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // #include "../cub.h"
 #include "../parser.h"
 
-void	count_element(char **element)
+static void count_element(char **element)
 {
 	int el_count;
 
@@ -24,19 +24,34 @@ void	count_element(char **element)
 		ft_error(NULL, "Error\nFloor count is incorrect\n");
 }
 
-static int	create_rgb(int r, int g, int b)
+static void count_tokens(char *element)
+{
+	int token_count;
+
+	token_count = 1;
+	while (*element)
+	{
+		if (*element == ',')
+			token_count++;
+		element++;
+	}
+	if (token_count > 3)
+		ft_error(NULL, "Error\n Invalid number of colors");
+}
+
+static int create_rgb(int r, int g, int b)
 {
 	if (r > 255 || g > 255 || b > 255)
 		ft_error(NULL, "Error\nRgb value must not be more than 255");
 	return (((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff));
 }
 
-int	save_color(char **element)
+int save_color(char **element)
 {
 	int color;
-	char	**color_char;
+	char **color_char;
 	static int color_num;
-	int		i;
+	int i;
 
 	i = 0;
 	while (element[i])
@@ -44,11 +59,11 @@ int	save_color(char **element)
 	if (i != 2 || color_num > 1)
 		ft_error(NULL, "Error\nColor information are incorrect\n");
 	color_num++;
+	count_tokens(element[1]);
 	i = 0;
 	while (element[1][i])
 	{
-		if (element[1][i] != ',' && (element[1][i] < '0'
-			|| element[1][i] > '9'))
+		if (element[1][i] != ',' && (element[1][i] < '0' || element[1][i] > '9'))
 			ft_error(NULL, "Error\nFloor information are incorrect\n");
 		i++;
 	}
