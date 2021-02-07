@@ -3,14 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   map_error_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mobaz <mobaz@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/12 10:25:15 by mobaz             #+#    #+#             */
-/*   Updated: 2020/11/12 10:27:04 by mobaz            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:17 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../cub.h"
 #include "../parser.h"
 
 void		check_if_valid(t_config *config, int i, int j)

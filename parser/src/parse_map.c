@@ -6,11 +6,10 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 12:48:09 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 18:15:54 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:28 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "../cub.h"
 #include "../parser.h"
 
 static char	**ft_reallocate(char **old_map,int i)

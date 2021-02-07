@@ -6,11 +6,9 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 12:16:49 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 17:59:15 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:24 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// #include "../cub.h"
 
 #include "../parser.h"
 
@@ -65,11 +63,24 @@ static int		get_elements(t_config *config ,int fd, char *line)
 		{
 			element = ft_split(line, ' ');
 			if (!*element)
-				ft_error(config->map,"Error\nInvalid file configuration");
+				ft_error(config->map,"Error\nInvalid configuration");
 			check_element(config, element);
 		}
 	}
 	return (0);
+}
+static t_config init_config(t_args args)
+{
+	t_config config;
+
+	config.is_save = args.is_save;
+	config.map = NULL;
+	config.player = (t_player_pos){0, 0, '\0'};
+	config.res = (t_resolution){0, 0};
+	config.tex = (t_textures_paths){NULL, NULL, NULL, NULL, NULL};
+	config.colors = (t_colors) {0, 0};
+	config.sprite_count = 0;
+	return (config);
 }
 
 t_config	parse_file(int argc, char **argv)
@@ -81,14 +92,7 @@ t_config	parse_file(int argc, char **argv)
 	t_args args;
 
 	args = get_args(argc, argv);
-    // TODO: init config
-	config.is_save = args.is_save;
-	config.map = NULL;
-	config.player = (t_player_pos){0, 0, '\0'};
-	config.res = (t_resolution){0, 0};
-	config.tex = (t_textures_paths){NULL, NULL, NULL, NULL, NULL};
-	config.colors = (t_colors) {0, 0};
-	config.sprite_count = 0;
+	config = init_config(args);
 	status = 0;
 	fd = open(args.file, O_RDONLY);
 	if (fd > 0)
@@ -102,23 +106,8 @@ t_config	parse_file(int argc, char **argv)
 			}
 			free(line);
 		}
-		if (status == 0)
-			ft_error(config.map,"Error\nInvalid file configuration");
+		ft_error(config.map,"Error\nInvalid file");
 	}
-	else
-		ft_error(config.map,"Error\ninvalid file\n");
-
-	return config;
+	ft_error(config.map,"Error\nInvalid file\n");
+	return (config);
 }
-
-// struct game{}
-// void create_game(int argc, char **argv)
-// {
-// 	t_args args;
-// 	args = get_args(argc, argv);
-// 	parse_file(args.file);
-
-// 	// draw();
-// 	if (args.is_save)
-// 		take_screenshot();
-// }

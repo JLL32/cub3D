@@ -1,16 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   save_direction_textures.c                          :+:      :+:    :+:   */
+/*   save_texture.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 19:56:14 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 18:11:53 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:47 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "../cub.h"
 #include "../parser.h"
 
 char	*save_texture(char **texture)
@@ -26,7 +25,7 @@ char	*save_texture(char **texture)
 	while (texture[i])
 		i++;
 	if (i != 2)
-		ft_error(NULL, "Error\nNorth number of information is incorrect\n");
+		ft_error(NULL, "Error\nTexture information is incorrect\n");
 	texture_path = ft_strdup(texture[1]);
 	free_double_pointer(texture);
 	return (texture_path);

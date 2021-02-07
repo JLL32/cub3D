@@ -6,11 +6,10 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 19:58:03 by mobaz             #+#    #+#             */
-/*   Updated: 2021/02/06 18:47:33 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:41 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "../cub.h"
 #include "../parser.h"
 
 static int		check_resolution_error(char **resolution, int i)

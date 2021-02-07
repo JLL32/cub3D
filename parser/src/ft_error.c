@@ -3,14 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_error.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mobaz <mobaz@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/24 13:29:30 by mobaz             #+#    #+#             */
-/*   Updated: 2020/11/11 12:59:13 by mobaz            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:08 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../cub.h"
 #include "../parser.h"
 
 void	ft_map_error(char **map, int i, int j)

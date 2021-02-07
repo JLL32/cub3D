@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   player.c                                           :+:      :+:    :+:   */
+/*   save_player.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mobaz <mobaz@student.42.fr>                +#+  +:+       +#+        */
+/*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 12:48:33 by mobaz             #+#    #+#             */
-/*   Updated: 2020/11/12 10:36:01 by mobaz            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:37 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include "../cub.h"
 #include "../parser.h"
 
 static void	get_player_pos_map(t_config *config, int i, int j)
 {
 	char **map;
 	t_player_pos *player;
-	
+
 	map = config->map;
 	player = &config->player;
 	player->pos_x = i;

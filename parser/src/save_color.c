@@ -6,11 +6,10 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 18:49:03 by mobaz             #+#    #+#             */
-/*   Updated: 2021/02/06 18:31:35 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:07:33 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include "../cub.h"
 #include "../parser.h"
 
 static void count_element(char **element)
@@ -21,7 +20,7 @@ static void count_element(char **element)
 	while (element[el_count])
 		el_count++;
 	if (el_count != 3)
-		ft_error(NULL, "Error\nFloor count is incorrect\n");
+		ft_error(NULL, "Error\nInvalid number of color arguments\n");
 }
 
 static void count_tokens(char *element)
@@ -36,7 +35,7 @@ static void count_tokens(char *element)
 		element++;
 	}
 	if (token_count > 3)
-		ft_error(NULL, "Error\n Invalid number of colors");
+		ft_error(NULL, "Error\nInvalid number of colors");
 }
 
 static int create_rgb(int r, int g, int b)
@@ -64,7 +63,7 @@ int save_color(char **element)
 	while (element[1][i])
 	{
 		if (element[1][i] != ',' && (element[1][i] < '0' || element[1][i] > '9'))
-			ft_error(NULL, "Error\nFloor information are incorrect\n");
+			ft_error(NULL, "Error\nColor information are incorrect\n");
 		i++;
 	}
 	color_char = ft_split(element[1], ',');

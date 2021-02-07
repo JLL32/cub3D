@@ -6,12 +6,11 @@
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/11 14:04:54 by mobaz             #+#    #+#             */
-/*   Updated: 2021/01/28 18:19:47 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/07 17:06:44 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
- //#include "../cub.h"
- #include "../parser.h"
+#include "../parser.h"
 
 static void		check_surrounding(char **map,int i, int j, char c)
 {

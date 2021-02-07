@@ -9,7 +9,7 @@ SRCS =	src/get_next_line.c \
 		src/save_resolution.c \
 		src/parse_file.c \
 		src/save_texture.c \
-		src/player.c \
+		src/save_player.c \
 		src/free_memory.c \
 		src/ft_error.c \
 		src/map_error.c \
