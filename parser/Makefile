@@ -20,7 +20,7 @@ NAME = libparser.a
 all: $(NAME)
 
 $(NAME): $(SRCS) ./Makefile
-	gcc $(FLAGS) -g $(SRCS) -c
+	gcc -g $(FLAGS) -g $(SRCS) -c
 	ar rc $(NAME) *.o
 
 clean:
