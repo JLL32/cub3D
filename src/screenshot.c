@@ -1,6 +1,18 @@
-#include "../cub3D.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   screenshot.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/09 15:18:07 by ael-hach          #+#    #+#             */
+/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static char	*make_bmp_header(t_bitmapheader *header, t_resolution res)
+#include "../cub.h"
+
+static char		*make_bmp_header(t_bitmapheader *header, t_resolution res)
 {
 	char	*buf;
 
@@ -38,7 +50,7 @@ static int		*get_colors(int color)
 	return (colors);
 }
 
-static char	*make_img_buff(t_bitmapheader *header, t_game game)
+static char		*make_img_buff(t_bitmapheader *header, t_game game)
 {
 	char	*buf;
 	int		i;
@@ -65,7 +77,7 @@ static char	*make_img_buff(t_bitmapheader *header, t_game game)
 	return (buf);
 }
 
-void	take_screenshot(t_game game)
+void			take_screenshot(t_game game)
 {
 	t_bitmapheader	header;
 	char			*header_str;

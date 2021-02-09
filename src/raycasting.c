@@ -1,28 +1,42 @@
-#include "../cub3D.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raycasting.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/09 15:10:53 by ael-hach          #+#    #+#             */
+/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../cub.h"
 
 /*
  ** calculate ray position and direction
 */
 
-static t_coordinate get_ray_dir(t_player player, int win_width, int x)
+static t_coordinate		get_ray_dir(t_player player, int win_width, int x)
 {
-	double camera_x;
-	t_coordinate ray_dir;
+	double			camera_x;
+	t_coordinate	ray_dir;
 
-	camera_x = 2 * x / (double)win_width - 1; //x-coordinate in camera space
+	camera_x = 2 * x / (double)win_width - 1;
 	ray_dir.x = player.dir_x + player.plane_x * camera_x;
 	ray_dir.y = player.dir_y + player.plane_y * camera_x;
-	return ray_dir;
+	return (ray_dir);
 }
 
 /*
 ** length of ray from current position to next x or y-side
 */
 
-static t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
-		t_square map, t_player player)
+static t_coordinate		get_side_dist(t_coordinate delta_dist,
+		t_coordinate ray_dir,
+		t_square map,
+		t_player player)
 {
-	t_coordinate side_dist;
+	t_coordinate	side_dist;
 
 	if (ray_dir.x < 0)
 	{
@@ -40,16 +54,16 @@ static t_coordinate get_side_dist(t_coordinate delta_dist,t_coordinate ray_dir,
 	{
 		side_dist.y = (map.y + 1.0 - player.pos_y) * delta_dist.y;
 	}
-	return side_dist;
+	return (side_dist);
 }
 
 /*
 ** what direction to step in x or y-direction (either +1 or -1)
 */
 
-static t_square get_step_dir(t_coordinate ray_dir)
+static t_square			get_step_dir(t_coordinate ray_dir)
 {
-	t_square step_dir;
+	t_square	step_dir;
 
 	if (ray_dir.x < 0)
 	{
@@ -67,12 +81,13 @@ static t_square get_step_dir(t_coordinate ray_dir)
 	{
 		step_dir.y = 1;
 	}
-	return step_dir;
+	return (step_dir);
 }
 
-t_ray get_ray(t_player player, int win_width, int x)
+t_ray					get_ray(t_player player, int win_width, int x)
 {
-	t_ray ray;
+	t_ray	ray;
+
 	ray.dir = get_ray_dir(player, win_width, x);
 	ray.map_pos = (t_square){player.pos_x, player.pos_y};
 	ray.delta_dist = (t_coordinate){fabs(1.0 / ray.dir.x),
@@ -81,4 +96,3 @@ t_ray get_ray(t_player player, int win_width, int x)
 	ray.step_dir = get_step_dir(ray.dir);
 	return (ray);
 }
-

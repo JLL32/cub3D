@@ -15,7 +15,7 @@ SRCS = src/main.c \
 		src/sprite.c \
 		src/sort_sprites.c \
 		src/screenshot.c
-INCL = src/cub3D.h
+INCL = src/cub.h
 MLX = ./mlx/Makefile
 
 all: $(NAME)

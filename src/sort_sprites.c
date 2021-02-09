@@ -1,16 +1,30 @@
-#include "../cub3D.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sort_sprites.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/09 15:19:51 by ael-hach          #+#    #+#             */
+/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static void swap(t_pair *xp, t_pair *yp)
+#include "../cub.h"
+
+static void	swap(t_pair *xp, t_pair *yp)
 {
-	t_pair temp;
+	t_pair	temp;
+
 	temp = *xp;
 	*xp = *yp;
 	*yp = temp;
 }
 
-static void pair_sort(t_pair arr[], int n)
+static void	pair_sort(t_pair arr[], int n)
 {
-	int i, j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (i < n - 1)
@@ -32,11 +46,12 @@ static void pair_sort(t_pair arr[], int n)
 ** can draw sprites from farthest to nearest
 */
 
-void sort_sprites(int *order, double *dist, int amount)
+void		sort_sprites(int *order, double *dist, int amount)
 {
-	t_pair sprites[amount];
-	int i;
+	t_pair	*sprites;
+	int		i;
 
+	sprites = malloc(sizeof(*sprites) * amount);
 	i = 0;
 	while (i < amount)
 	{
@@ -52,4 +67,5 @@ void sort_sprites(int *order, double *dist, int amount)
 		order[i] = sprites[amount - i - 1].second;
 		i++;
 	}
+	free(sprites);
 }

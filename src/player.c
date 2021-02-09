@@ -1,8 +1,21 @@
-#include "../cub3D.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   player.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/09 15:07:19 by ael-hach          #+#    #+#             */
+/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-t_player create_player(double x, double y, char dir)
+#include "../cub.h"
+
+t_player	create_player(double x, double y, char dir)
 {
 	t_player player;
+
 	if (dir == 'N')
 	{
 		player = (t_player){x, y, -1, 0, MOVE_SPD, ROT_SPD, 0, PLANE};
@@ -22,11 +35,11 @@ t_player create_player(double x, double y, char dir)
 	return (player);
 }
 
-void move_up(t_player *player, char **world_map)
+void		move_up(t_player *player, char **world_map)
 {
-	double next_x;
-	double next_y;
-	
+	double	next_x;
+	double	next_y;
+
 	next_x = player->pos_x + player->dir_x * player->move_speed;
 	next_y = player->pos_y + player->dir_y * player->move_speed;
 	if (world_map[(int)(next_x)][(int)(player->pos_y)] == '0')
@@ -35,11 +48,11 @@ void move_up(t_player *player, char **world_map)
 		player->pos_y = next_y;
 }
 
-void move_down(t_player *player, char **world_map)
+void		move_down(t_player *player, char **world_map)
 {
-	double next_x;
-	double next_y;
-	
+	double	next_x;
+	double	next_y;
+
 	next_x = player->pos_x - player->dir_x * player->move_speed;
 	next_y = player->pos_y - player->dir_y * player->move_speed;
 	if (world_map[(int)(next_x)][(int)(player->pos_y)] == '0')
@@ -48,11 +61,11 @@ void move_down(t_player *player, char **world_map)
 		player->pos_y = next_y;
 }
 
-void move_right(t_player *player, char **world_map)
+void		move_right(t_player *player, char **world_map)
 {
-	double next_x;
-	double next_y;
-	
+	double	next_x;
+	double	next_y;
+
 	next_x = player->pos_x + player->plane_x * player->move_speed;
 	next_y = player->pos_y + player->plane_y * player->move_speed;
 	if (world_map[(int)(next_x)][(int)(player->pos_y)] == '0')
