@@ -6,7 +6,7 @@
 /*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 15:05:53 by ael-hach          #+#    #+#             */
-/*   Updated: 2021/02/09 16:51:42 by ael-hach         ###   ########.fr       */
+/*   Updated: 2021/02/09 16:57:05 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ int		on_key_press(int keycode, t_game *game)
 
 	player = &game->player;
 	textures = game->textures;
-	if (keycode == KEY_UP)
+	if (keycode == KEY_W)
 		move_up(player, game->world_map);
-	if (keycode == KEY_DOWN)
+	if (keycode == KEY_S)
 		move_down(player, game->world_map);
 	if (keycode == KEY_RIGHT)
 		turn_right(player);
