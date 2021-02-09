@@ -39,10 +39,10 @@ static void	check_every_token(char *element)
 	token_count = 1;
 	while (element[i])
 	{
+		if (element[i] != ',' && (element[i] < '0' || element[i] > '9'))
+			ft_error(NULL, "Error\nColor information are incorrect\n");
 		if (element[i] == ',')
 			token_count++;
-		else if (element[i] < '0' || element[i] > '9')
-			ft_error(NULL, "Error\nColor information are incorrect\n");
 		i++;
 	}
 	if (token_count > 3)

@@ -16,8 +16,8 @@ static void		check_missing_element(t_config config)
 {
 	if (!config.res.height || !config.res.width)
 		ft_error(config.map, "Error\nMissing resolution information");
-	if (!config.colors.ceiling || !config.colors.floor)
-		ft_error(config.map, "Error\nMissing color information");
+	//if (!config.colors.ceiling || !config.colors.floor)
+	//	ft_error(config.map, "Error\nMissing color information");
 }
 
 static t_args	get_args(int c, char **v)
