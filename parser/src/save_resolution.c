@@ -34,6 +34,28 @@ static int		check_resolution_error(char **resolution, int i)
 	return (0);
 }
 
+static int get_width(char *resolution)
+{
+	int width;
+
+	width = ft_atoi(resolution);
+	width = width > 2560 ? 2560 : width;
+	if (width < 0)
+		ft_error(NULL, "Error\nIncorrect resolution");
+	return (width);
+}
+
+static int get_height(char *resolution)
+{
+	int height;
+
+	height = ft_atoi(resolution);
+	height = height > 1440 ? 1440 : height;
+	if (height < 0)
+		ft_error(NULL, "Error\nIncorrect resolution");
+	return (height);
+}
+
 t_resolution	save_resolution(char **resolution)
 {
 	t_resolution res;
@@ -49,19 +71,9 @@ t_resolution	save_resolution(char **resolution)
 		if (check_resolution_error(resolution, i))
 			ft_error(NULL, "Error\nResolution is invalid");
 		if (i == 1)
-		{
-			res.width = ft_atoi(resolution[1]);
-			res.width = res.width > 2560 ? 2560 : res.width;
-			if (res.width < 0)
-				ft_error(NULL, "Error\nIncorrect resolution");
-		}
+			res.width = get_width(resolution[1]);
 		else if (i == 2)
-		{
-			res.height = ft_atoi(resolution[2]);
-			res.height = res.height > 1440 ? 1440 : res.height;
-			if (res.height < 0)
-				ft_error(NULL, "Error\nIncorrect resolution");
-		}
+			res.height = get_height(resolution[2]);	
 		i++;
 	}
 	free_double_pointer(resolution);
