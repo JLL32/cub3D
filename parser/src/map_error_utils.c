@@ -19,7 +19,7 @@ void		check_if_valid(t_config *config, int i, int j)
 	map = config->map;
 	if (!is_player(config, i, j) && !is_sprite(config, i, j) && map[i][j] != '1' && map[i][j] != '0'
 		 && map[i][j] != ' ')
-		ft_map_error(config->map, i, j);
+		raise_map_error(config->map, i, j);
 }
 
 void		check_next_row(char **map, int i, int j, char c, int curr_len)
@@ -32,10 +32,10 @@ void		check_next_row(char **map, int i, int j, char c, int curr_len)
 	if (next_len >= curr_len)
 	{
 		if (map[i + 1][j] == c)
-			ft_map_error(map, i, j);
+			raise_map_error(map, i, j);
 	}
 	else if (c == ' ' && j > next_len)
-		ft_map_error(map, i, j);
+		raise_map_error(map, i, j);
 }
 
 void		check_prev_row(char **map, int i, int j, char c, int curr_len)
@@ -43,14 +43,8 @@ void		check_prev_row(char **map, int i, int j, char c, int curr_len)
 	if (g_prev_len >= curr_len)
 	{
 		if (map[i - 1][j] == c)
-			ft_map_error(map, i, j);
+			raise_map_error(map, i, j);
 	}
 	else if (c == ' ' && j > g_prev_len)
-		ft_map_error(map, i, j);
-}
-
-void		check_up_down(char **map, int i, int j, char c, int curr_len)
-{
-	check_next_row(map, i, j, c, curr_len);
-	check_prev_row(map, i, j, c, curr_len);
+		raise_map_error(map, i, j);
 }
