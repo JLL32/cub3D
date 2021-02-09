@@ -5,7 +5,7 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/24 13:29:30 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/24 13:29:30 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:07:08 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -14,8 +14,8 @@
 
 void	raise_map_error(char **map, int i, int j)
 {
-	char *row;
-	char *col;
+	char	*row;
+	char	*col;
 
 	row = ft_itoa(i);
 	col = ft_itoa(j);

@@ -5,7 +5,7 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/19 19:58:03 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/19 19:58:03 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:07:41 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -14,7 +14,7 @@
 
 static int		check_resolution_error(char **resolution, int i)
 {
-	int j;
+	int	j;
 
 	if (i > 2)
 	{
@@ -34,9 +34,9 @@ static int		check_resolution_error(char **resolution, int i)
 	return (0);
 }
 
-static int get_width(char *resolution)
+static int		get_width(char *resolution)
 {
-	int width;
+	int	width;
 
 	width = ft_atoi(resolution);
 	width = width > 2560 ? 2560 : width;
@@ -45,9 +45,9 @@ static int get_width(char *resolution)
 	return (width);
 }
 
-static int get_height(char *resolution)
+static int		get_height(char *resolution)
 {
-	int height;
+	int	height;
 
 	height = ft_atoi(resolution);
 	height = height > 1440 ? 1440 : height;
@@ -58,9 +58,9 @@ static int get_height(char *resolution)
 
 t_resolution	save_resolution(char **resolution)
 {
-	t_resolution res;
-	static int res_count;
-	int i;
+	t_resolution	res;
+	static int		res_count;
+	int				i;
 
 	if (res_count > 0)
 		ft_error(NULL, "Error\n Duplicated resolution");
@@ -73,7 +73,7 @@ t_resolution	save_resolution(char **resolution)
 		if (i == 1)
 			res.width = get_width(resolution[1]);
 		else if (i == 2)
-			res.height = get_height(resolution[2]);	
+			res.height = get_height(resolution[2]);
 		i++;
 	}
 	free_double_pointer(resolution);

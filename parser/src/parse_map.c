@@ -5,20 +5,20 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/19 12:48:09 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/19 12:48:09 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:07:28 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../parser.h"
 
-static char	**ft_reallocate(char **old_map,int i)
+static char	**ft_reallocate(char **old_map, int i)
 {
 	char	**new_map;
 	int		j;
 
 	j = 0;
-	new_map = (char **)malloc((i+1) * sizeof(char *));
+	new_map = (char **)malloc((i + 1) * sizeof(char *));
 	while (j < i)
 	{
 		new_map[j] = old_map[j];
@@ -29,15 +29,15 @@ static char	**ft_reallocate(char **old_map,int i)
 	return (new_map);
 }
 
-char	**parse_map(t_config *config, int fd, char *line)
+char		**parse_map(t_config *config, int fd, char *line)
 {
-	int i;
-	int j;
-	char **map;
+	int		i;
+	int		j;
+	char	**map;
 
 	j = 1;
 	i = 1;
-	map = (char **)malloc((i+1) * sizeof(char *));
+	map = (char **)malloc((i + 1) * sizeof(char *));
 	map[0] = line;
 	while (j)
 	{

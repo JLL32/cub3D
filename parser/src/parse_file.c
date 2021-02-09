@@ -5,46 +5,46 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/19 12:16:49 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/19 12:16:49 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:07:24 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../parser.h"
 
-static void	check_missing_element(t_config config)
+static void		check_missing_element(t_config config)
 {
 	if (!config.res.height || !config.res.width)
-		ft_error(config.map,"Error\nMissing resolution information");
+		ft_error(config.map, "Error\nMissing resolution information");
 	if (!config.colors.ceiling || !config.colors.floor)
-		ft_error(config.map,"Error\nMissing color information");
+		ft_error(config.map, "Error\nMissing color information");
 }
 
 static t_args	get_args(int c, char **v)
 {
-	char *ext;
-	t_args args;
+	char	*ext;
+	t_args	args;
 
 	args.is_save = false;
 	if (c == 1 || c > 3)
-		ft_error(NULL,"Error\ninvalid argument!");
-	ext	= ft_strrchr(v[1], '.');
+		ft_error(NULL, "Error\ninvalid argument!");
+	ext = ft_strrchr(v[1], '.');
 	if (!ext)
-		ft_error(NULL,"Error\ninvalid argument!");
+		ft_error(NULL, "Error\ninvalid argument!");
 	else if (ft_strncmp(ext, ".cub", 5) != 0)
-		ft_error(NULL,"Error\ninvalid argument!");
+		ft_error(NULL, "Error\ninvalid argument!");
 	args.file = v[1];
 	if (c == 3)
 	{
 		if (ft_strncmp("--save", v[2], 7) == 0)
 			args.is_save = true;
 		else
-			ft_error(NULL,"Error\ninvalid argument!");
+			ft_error(NULL, "Error\ninvalid argument!");
 	}
 	return (args);
 }
 
-static int		get_elements(t_config *config ,int fd, char *line)
+static int		get_elements(t_config *config, int fd, char *line)
 {
 	char	**element;
 	int		i;
@@ -63,15 +63,16 @@ static int		get_elements(t_config *config ,int fd, char *line)
 		{
 			element = ft_split(line, ' ');
 			if (!*element)
-				ft_error(config->map,"Error\nInvalid configuration");
+				ft_error(config->map, "Error\nInvalid configuration");
 			check_element(config, element);
 		}
 	}
 	return (0);
 }
-static t_config init_config(t_args args)
+
+static t_config	init_config(t_args args)
 {
-	t_config config;
+	t_config	config;
 
 	config.is_save = args.is_save;
 	config.map = NULL;
@@ -83,13 +84,13 @@ static t_config init_config(t_args args)
 	return (config);
 }
 
-t_config	parse_file(int argc, char **argv)
+t_config		parse_file(int argc, char **argv)
 {
-	int		fd;
-	char	*line;
-	int		status;
-	t_config config;
-	t_args args;
+	int			fd;
+	char		*line;
+	int			status;
+	t_config	config;
+	t_args		args;
 
 	args = get_args(argc, argv);
 	config = init_config(args);
@@ -106,8 +107,8 @@ t_config	parse_file(int argc, char **argv)
 			}
 			free(line);
 		}
-		ft_error(config.map,"Error\nInvalid file");
+		ft_error(config.map, "Error\nInvalid file");
 	}
-	ft_error(config.map,"Error\nInvalid file\n");
+	ft_error(config.map, "Error\nInvalid file\n");
 	return (config);
 }

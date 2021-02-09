@@ -12,9 +12,9 @@
 
 #include "../parser.h"
 
-static void		check_surrounding(char **map,int i, int j, char c)
+static void		check_surrounding(char **map, int i, int j, char c)
 {
-	int curr_len;
+	int	curr_len;
 
 	curr_len = ft_strlen(map[i]);
 	if (j > 0 && map[i][j - 1] == c)
@@ -26,7 +26,7 @@ static void		check_surrounding(char **map,int i, int j, char c)
 	check_prev_row(map, i, j, c, curr_len);
 }
 
-static void		check_error(char **map,int i, int j)
+static void		check_error(char **map, int i, int j)
 {
 	if (map[i][j] != '1')
 	{
@@ -40,11 +40,11 @@ static void		check_error(char **map,int i, int j)
 	}
 }
 
-void		map_error(t_config *config)
+void			map_error(t_config *config)
 {
-	char **map;
-	int i;
-	int j;
+	char	**map;
+	int		i;
+	int		j;
 
 	map = config->map;
 	i = 0;

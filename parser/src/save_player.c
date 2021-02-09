@@ -5,17 +5,17 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/19 12:48:33 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/19 12:48:33 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:07:37 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../parser.h"
 
-static void	get_player_pos_map(t_config *config, int i, int j)
+static void		get_player_pos_map(t_config *config, int i, int j)
 {
-	char **map;
-	t_player_pos *player;
+	char			**map;
+	t_player_pos	*player;
 
 	map = config->map;
 	player = &config->player;
@@ -25,9 +25,9 @@ static void	get_player_pos_map(t_config *config, int i, int j)
 	map[i][j] = '0';
 }
 
-int		is_player(t_config *config, int i, int j)
+int				is_player(t_config *config, int i, int j)
 {
-	char **map;
+	char	**map;
 
 	map = config->map;
 	if (map[i][j] == 'N' || map[i][j] == 'S' || map[i][j] == 'E' ||

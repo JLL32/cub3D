@@ -5,7 +5,7 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/24 12:19:09 by mobaz             #+#    #+#             */
+/*   Created: 2020/10/24 12:19:09 by jll32             #+#    #+#             */
 /*   Updated: 2021/02/07 17:06:58 by jll32            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -14,7 +14,7 @@
 
 void	free_double_pointer(char **ptr)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (ptr[i])
@@ -22,7 +22,7 @@ void	free_double_pointer(char **ptr)
 	free(ptr);
 }
 
-int		free_memory(char **map,int status)
+int		free_memory(char **map, int status)
 {
 	if (map)
 		free_double_pointer(map);
