@@ -22,6 +22,12 @@ static void		check_surrounding(char **map, int i, int j, char c)
 	if (j <= curr_len)
 		if (map[i][j + 1] == c)
 			raise_map_error(map, i, j);
+	if (map[i][j + 1] == '\0')
+		raise_map_error(map, i, j);
+	if (j >= g_prev_len && i != 0)
+		raise_map_error(map, i, j);
+	if (j == 0)
+		raise_map_error(map, i, j);
 	check_next_row(map, (t_point){i, j}, c, curr_len);
 	check_prev_row(map, (t_point){i, j}, c, curr_len);
 }
