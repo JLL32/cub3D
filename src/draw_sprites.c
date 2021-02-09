@@ -26,7 +26,6 @@ static void populate_distance(t_player player, double sprite_distance[], t_coord
 
 void draw_every_sprite(t_game *game, double z_buffer[], int num)
 {
-	// arrays used to sort the sprites
 	t_sprite sprite;
 	int sprite_order[num];
 	double sprite_distance[num];
@@ -35,8 +34,6 @@ void draw_every_sprite(t_game *game, double z_buffer[], int num)
 	populate_order(sprite_order, num);
 	populate_distance(game->player, sprite_distance, game->sprite_positions, num);
 	sort_sprites(sprite_order, sprite_distance, num);
-
-	// after sorting the sprites do the projection and draw them
 	i = 0;
 	while (i < num)
 	{
