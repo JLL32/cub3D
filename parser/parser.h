@@ -6,7 +6,7 @@
 /*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 12:34:19 by ael-hach          #+#    #+#             */
-/*   Updated: 2021/02/09 12:47:42 by ael-hach         ###   ########.fr       */
+/*   Updated: 2021/02/09 14:27:14 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,11 @@ typedef struct	s_config
 	bool				is_save;
 	t_coordinate		sprites[200];
 }				t_config;
+typedef struct	s_point
+{
+	int	i;
+	int	j;
+}				t_point;
 
 int		g_prev_len;
 size_t	g_player_num;
@@ -88,7 +93,7 @@ void			map_error(t_config *config);
 void			check_if_valid(t_config *config, int i, int j);
 int				is_player(t_config *config, int i, int j);
 int				is_sprite(t_config *config, int i, int j);
-void			check_next_row(char **map, int i, int j, char c, int curr_len);
-void			check_prev_row(char **map, int i, int j, char c, int curr_len);
+void			check_next_row(char **map, t_point point, char c, int curr_len);
+void			check_prev_row(char **map, t_point point, char c, int curr_len);
 int				free_memory(char **map, int status);
 #endif

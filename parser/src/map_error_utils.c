@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_error_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jll32 <jll32@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/12 10:25:15 by jll32             #+#    #+#             */
-/*   Updated: 2021/02/07 17:07:17 by jll32            ###   ########.fr       */
+/*   Updated: 2021/02/09 14:27:32 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,14 @@ void		check_if_valid(t_config *config, int i, int j)
 		raise_map_error(config->map, i, j);
 }
 
-void		check_next_row(char **map, int i, int j, char c, int curr_len)
+void		check_next_row(char **map, t_point point, char c, int curr_len)
 {
-	int		next_len;
+	int	next_len;
+	int	i;
+	int	j;
 
+	i = point.i;
+	j = point.j;
 	next_len = 0;
 	if (map[i + 1])
 		next_len = ft_strlen(map[i + 1]);
@@ -40,8 +44,13 @@ void		check_next_row(char **map, int i, int j, char c, int curr_len)
 		raise_map_error(map, i, j);
 }
 
-void		check_prev_row(char **map, int i, int j, char c, int curr_len)
+void		check_prev_row(char **map, t_point point, char c, int curr_len)
 {
+	int	i;
+	int	j;
+
+	i = point.i;
+	j = point.j;
 	if (g_prev_len >= curr_len)
 	{
 		if (map[i - 1][j] == c)

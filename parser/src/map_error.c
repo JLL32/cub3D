@@ -6,7 +6,7 @@
 /*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/11 14:04:54 by jll32             #+#    #+#             */
-/*   Updated: 2021/02/09 12:53:49 by ael-hach         ###   ########.fr       */
+/*   Updated: 2021/02/09 14:26:43 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ static void		check_surrounding(char **map, int i, int j, char c)
 	if (j <= curr_len)
 		if (map[i][j + 1] == c)
 			raise_map_error(map, i, j);
-	check_next_row(map, i, j, c, curr_len);
-	check_prev_row(map, i, j, c, curr_len);
+	check_next_row(map, (t_point){i, j}, c, curr_len);
+	check_prev_row(map, (t_point){i, j}, c, curr_len);
 }
 
 static void		check_error(char **map, int i, int j)
