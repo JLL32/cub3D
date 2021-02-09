@@ -12,7 +12,7 @@
 
 #include "../parser.h"
 
-void	ft_map_error(char **map, int i, int j)
+void	raise_map_error(char **map, int i, int j)
 {
 	char *row;
 	char *col;
