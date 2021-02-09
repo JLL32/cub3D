@@ -6,7 +6,7 @@
 /*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 14:58:11 by ael-hach          #+#    #+#             */
-/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*   Updated: 2021/02/09 17:14:26 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static t_data	load_texture(char *path, t_game *game)
 	if (texture_buffer.img == NULL || texture_buffer.width != TEX_WIDTH ||
 		texture_buffer.height != TEX_HEIGHT)
 	{
-		ft_putstr_fd("ERROR: Invalid texture", 2);
+		ft_putstr_fd("Error\n Invalid texture", 2);
 		exit_game(game, EXIT_FAILURE);
 	}
 	texture_buffer.addr = (int *)mlx_get_data_addr(texture_buffer.img,
