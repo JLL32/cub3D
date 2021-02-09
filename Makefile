@@ -24,7 +24,7 @@ $(NAME): $(SRCS) ./mlx/Makefile ./Makefile
 	make -C ./mlx/
 	make -C ./libft/
 	make -C ./parser/
-	CC $(DFLAGS) $(SRCS) -L ./libft -lft -L ./parser -lparser -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	CC $(SRCS) -L ./libft -lft -L ./parser -lparser -L ./mlx/ -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 clean:
 	make -C ./mlx/ clean
