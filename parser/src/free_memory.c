@@ -24,7 +24,6 @@ void	free_double_pointer(char **ptr)
 
 int		free_memory(char **map,int status)
 {
-	// free(g_rays);
 	if (map)
 		free_double_pointer(map);
 	exit(status);

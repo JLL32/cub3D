@@ -58,7 +58,7 @@ size_t				g_player_num;
 
 t_config	parse_file(int argc, char **argv);
 void	ft_error(char **map, char *error);
-void	ft_map_error(char **map, int i, int j);
+void	raise_map_error(char **map, int i, int j);
 void	check_element(t_config *config, char **element);
 t_resolution	save_resolution(char **resolution);
 int	save_color(char **element);
@@ -71,5 +71,4 @@ int		is_player(t_config *config, int i, int j);
 int		is_sprite(t_config *config, int i, int j);
 void		check_next_row(char **map, int i, int j, char c, int curr_len);
 void		check_prev_row(char **map, int i, int j, char c, int curr_len);
-void		check_up_down(char **map, int i, int j, char c, int curr_len);
 int		free_memory(char **map,int status);

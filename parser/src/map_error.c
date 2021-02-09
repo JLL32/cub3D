@@ -18,10 +18,10 @@ static void		check_surrounding(char **map,int i, int j, char c)
 
 	curr_len = ft_strlen(map[i]);
 	if (j > 0 && map[i][j - 1] == c)
-		ft_map_error(map, i, j);
+		raise_map_error(map, i, j);
 	if (j <= curr_len)
 		if (map[i][j + 1] == c)
-			ft_map_error(map, i, j);
+			raise_map_error(map, i, j);
 	check_next_row(map, i, j, c, curr_len);
 	check_prev_row(map, i, j, c, curr_len);
 }

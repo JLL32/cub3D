@@ -47,7 +47,6 @@ char	**parse_map(t_config *config, int fd, char *line)
 		map = ft_reallocate(map, i);
 	}
 	config->map = map;
-	// g_num_rows = i;
 	map_error(config);
 	return (map);
 }
