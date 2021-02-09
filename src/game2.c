@@ -6,7 +6,7 @@
 /*   By: ael-hach <ael-hach@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 15:05:53 by ael-hach          #+#    #+#             */
-/*   Updated: 2021/02/09 16:09:10 by ael-hach         ###   ########.fr       */
+/*   Updated: 2021/02/09 16:51:42 by ael-hach         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@ int		on_key_press(int keycode, t_game *game)
 	if (keycode == KEY_DOWN)
 		move_down(player, game->world_map);
 	if (keycode == KEY_RIGHT)
-		move_right(player, game->world_map);
-	if (keycode == KEY_LEFT)
-		move_left(player, game->world_map);
-	if (keycode == KEY_D)
 		turn_right(player);
-	if (keycode == KEY_A)
+	if (keycode == KEY_LEFT)
 		turn_left(player);
+	if (keycode == KEY_D)
+		move_right(player, game->world_map);
+	if (keycode == KEY_A)
+		move_left(player, game->world_map);
 	if (keycode == KEY_ESC)
 		exit_game(game, EXIT_SUCCESS);
 	draw(game);
