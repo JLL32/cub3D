@@ -24,7 +24,7 @@ static void		check_surrounding(char **map, int i, int j, char c)
 			raise_map_error(map, i, j);
 	if (map[i][j + 1] == '\0')
 		raise_map_error(map, i, j);
-	if (j >= g_prev_len && i != 0)
+	if (j >= g_prev_len && i != 0 && map[i][j] != ' ')
 		raise_map_error(map, i, j);
 	if (j == 0 && map[i][j] != ' ')
 		raise_map_error(map, i, j);
