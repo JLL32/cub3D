@@ -33,7 +33,7 @@
 # define KEY_D 2
 # define KEY_ESC 53
 # define PLANE .66
-# define MOVE_SPD 0.3
+# define MOVE_SPD 0.2
 # define ROT_SPD .06
 
 typedef struct		s_data
