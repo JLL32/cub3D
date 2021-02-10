@@ -15,7 +15,7 @@
 static void	check_presence(t_presence is_present)
 {
 	if(is_present.resolution == false)
-		ft_error(NULL, "Error\n Missing resulution");
+		ft_error(NULL, "Error\n Missing resolution");
 	if(is_present.no_tex == false)
 		ft_error(NULL, "Error\n Missing north texture");
 	if(is_present.we_tex == false)
