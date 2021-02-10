@@ -15,12 +15,13 @@
 void		check_if_valid(t_config *config, int i, int j)
 {
 	char	**map;
-
+	if (i == 8)
+		return;
 	map = config->map;
-	if (!is_player(config, i, j)
+	if (map[i][0] == '\0' || (!is_player(config, i, j)
 		&& !is_sprite(config, i, j)
 		&& map[i][j] != '1' && map[i][j] != '0'
-		&& map[i][j] != ' ')
+		&& map[i][j] != ' '))
 		raise_map_error(config->map, i, j);
 }
 

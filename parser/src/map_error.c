@@ -26,7 +26,7 @@ static void		check_surrounding(char **map, int i, int j, char c)
 		raise_map_error(map, i, j);
 	if (j >= g_prev_len && i != 0)
 		raise_map_error(map, i, j);
-	if (j == 0)
+	if (j == 0 && map[i][j] != ' ')
 		raise_map_error(map, i, j);
 	check_next_row(map, (t_point){i, j}, c, curr_len);
 	check_prev_row(map, (t_point){i, j}, c, curr_len);
@@ -57,6 +57,8 @@ void			map_error(t_config *config)
 	while (map[i])
 	{
 		j = 0;
+		if (map[i][j] == '\0')
+			raise_map_error(map, i, j);
 		while (map[i][j])
 		{
 			check_if_valid(config, i, j);
