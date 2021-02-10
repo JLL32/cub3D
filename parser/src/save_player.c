@@ -19,8 +19,8 @@ static void		get_player_pos_map(t_config *config, int i, int j)
 
 	map = config->map;
 	player = &config->player;
-	player->pos_x = i;
-	player->pos_y = j;
+	player->pos_x = i + .5;
+	player->pos_y = j + .5;
 	player->dir = map[i][j];
 	map[i][j] = '0';
 }
