@@ -20,7 +20,7 @@ MLX = ./mlx/Makefile
 
 all: $(NAME)
 
-$(NAME): $(SRCS) ./mlx/Makefile ./Makefile
+$(NAME): $(SRCS) ./mlx/Makefile ./Makefile ./cub.h
 	make -C ./mlx/
 	make -C ./libft/
 	make -C ./parser/
