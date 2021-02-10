@@ -12,7 +12,7 @@
 
 #include "../parser.h"
 
-char	*save_texture(char **texture)
+char	*save_texture(char **texture, bool *presence)
 {
 	char		*texture_path;
 	static int	tex_num;
@@ -28,5 +28,6 @@ char	*save_texture(char **texture)
 		ft_error(NULL, "Error\nTexture information is incorrect\n");
 	texture_path = ft_strdup(texture[1]);
 	free_double_pointer(texture);
+	*presence = true;
 	return (texture_path);
 }

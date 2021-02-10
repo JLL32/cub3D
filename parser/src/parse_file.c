@@ -12,12 +12,24 @@
 
 #include "../parser.h"
 
-static void		check_missing_element(t_config config)
+static void	check_presence(t_presence is_present)
 {
-	if (!config.res.height || !config.res.width)
-		ft_error(config.map, "Error\nMissing resolution information");
-	//if (!config.colors.ceiling || !config.colors.floor)
-	//	ft_error(config.map, "Error\nMissing color information");
+	if(is_present.resolution == false)
+		ft_error(NULL, "Error\n Missing resulution");
+	if(is_present.no_tex == false)
+		ft_error(NULL, "Error\n Missing north texture");
+	if(is_present.we_tex == false)
+		ft_error(NULL, "Error\n Missing west texture");
+	if(is_present.so_tex == false)
+		ft_error(NULL, "Error\n Missing south texture");
+	if(is_present.ea_tex == false)
+		ft_error(NULL, "Error\n Missing east texture");
+	if(is_present.sp_tex == false)
+		ft_error(NULL, "Error\n Missing sprite texture");
+	if(is_present.floor == false)
+		ft_error(NULL, "Error\n Missing floor color");
+	if(is_present.ceiling == false)
+		ft_error(NULL, "Error\n Missing ceiling color");
 }
 
 static t_args	get_args(int c, char **v)
@@ -81,6 +93,8 @@ static t_config	init_config(t_args args)
 	config.tex = (t_textures_paths){NULL, NULL, NULL, NULL, NULL};
 	config.colors = (t_colors) {0, 0};
 	config.sprite_count = 0;
+	config.is_present = (t_presence){false, false, false, false,
+									false, false, false, false};
 	return (config);
 }
 
@@ -102,7 +116,7 @@ t_config		parse_file(int argc, char **argv)
 		{
 			if (get_elements(&config, fd, line) == 1)
 			{
-				check_missing_element(config);
+				check_presence(config.is_present);
 				return (config);
 			}
 			free(line);

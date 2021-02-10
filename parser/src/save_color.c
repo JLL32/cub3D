@@ -49,7 +49,7 @@ static void	check_every_token(char *element)
 		ft_error(NULL, "Error\nInvalid number of colors");
 }
 
-int			save_color(char **element)
+int			save_color(char **element, bool *presence)
 {
 	int			color;
 	char		**color_char;
@@ -69,5 +69,6 @@ int			save_color(char **element)
 		ft_atoi(color_char[0]), ft_atoi(color_char[1]), ft_atoi(color_char[2]));
 	free_double_pointer(color_char);
 	free_double_pointer(element);
+	*presence = true;
 	return (color);
 }

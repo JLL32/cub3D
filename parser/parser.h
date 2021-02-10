@@ -60,6 +60,18 @@ typedef struct	s_coordinate
 	double	y;
 }				t_coordinate;
 
+typedef struct	s_presence
+{
+	bool	resolution;
+	bool	no_tex;
+	bool	we_tex;
+	bool	so_tex;
+	bool	ea_tex;
+	bool	sp_tex;
+	bool	floor;
+	bool	ceiling;
+}				t_presence;
+
 typedef struct	s_config
 {
 	char				**map;
@@ -70,12 +82,14 @@ typedef struct	s_config
 	int					sprite_count;
 	bool				is_save;
 	t_coordinate		sprites[200];
+	t_presence			is_present;
 }				t_config;
 typedef struct	s_point
 {
 	int	i;
 	int	j;
 }				t_point;
+
 
 int		g_prev_len;
 size_t	g_player_num;
@@ -84,9 +98,9 @@ t_config		parse_file(int argc, char **argv);
 void			ft_error(char **map, char *error);
 void			raise_map_error(char **map, int i, int j);
 void			check_element(t_config *config, char **element);
-t_resolution	save_resolution(char **resolution);
-int				save_color(char **element);
-char			*save_texture(char **texture);
+t_resolution	save_resolution(char **resolution, bool *presence);
+int				save_color(char **element, bool *presence);
+char			*save_texture(char **texture, bool *presence);
 char			**parse_map(t_config *config, int fd, char *line);
 void			free_double_pointer(char **ptr);
 void			map_error(t_config *config);

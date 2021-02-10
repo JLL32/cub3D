@@ -56,7 +56,7 @@ static int		get_height(char *resolution)
 	return (height);
 }
 
-t_resolution	save_resolution(char **resolution)
+t_resolution	save_resolution(char **resolution, bool *presence)
 {
 	t_resolution	res;
 	static int		res_count;
@@ -77,5 +77,6 @@ t_resolution	save_resolution(char **resolution)
 		i++;
 	}
 	free_double_pointer(resolution);
+	*presence = true;
 	return (res);
 }
