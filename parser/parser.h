@@ -90,7 +90,6 @@ typedef struct	s_point
 	int	j;
 }				t_point;
 
-
 int		g_prev_len;
 size_t	g_player_num;
 

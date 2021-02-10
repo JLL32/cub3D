@@ -12,23 +12,23 @@
 
 #include "../parser.h"
 
-static void	check_presence(t_presence is_present)
+static void		check_presence(t_presence is_present)
 {
-	if(is_present.resolution == false)
+	if (is_present.resolution == false)
 		ft_error(NULL, "Error\n Missing resolution");
-	if(is_present.no_tex == false)
+	if (is_present.no_tex == false)
 		ft_error(NULL, "Error\n Missing north texture");
-	if(is_present.we_tex == false)
+	if (is_present.we_tex == false)
 		ft_error(NULL, "Error\n Missing west texture");
-	if(is_present.so_tex == false)
+	if (is_present.so_tex == false)
 		ft_error(NULL, "Error\n Missing south texture");
-	if(is_present.ea_tex == false)
+	if (is_present.ea_tex == false)
 		ft_error(NULL, "Error\n Missing east texture");
-	if(is_present.sp_tex == false)
+	if (is_present.sp_tex == false)
 		ft_error(NULL, "Error\n Missing sprite texture");
-	if(is_present.floor == false)
+	if (is_present.floor == false)
 		ft_error(NULL, "Error\n Missing floor color");
-	if(is_present.ceiling == false)
+	if (is_present.ceiling == false)
 		ft_error(NULL, "Error\n Missing ceiling color");
 }
 
