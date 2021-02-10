@@ -1,0 +1,13 @@
+R    500 500
+NO        ./assets/mossy.xpm
+SO ./assets/bluestone.xpm
+WE ./assets/greystone.xpm
+EA ./assets/redbrick.xpm
+S ./assets/barrel.xpm
+C  153,204,255
+F    224,224,224
+
+
+    1
+   1N1
+    1

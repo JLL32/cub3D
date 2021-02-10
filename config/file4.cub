@@ -1,0 +1,15 @@
+R 1000 700
+
+NO ./assets/bluestone.xpm
+WE ./assets/eagle.xpm
+SO ./assets/mossy.xpm
+EA ./assets/greystone.XPM
+S ./assets/pillar.xpm
+
+F 220,100,0
+C 225,30,0
+
+
+111
+1S1
+111
